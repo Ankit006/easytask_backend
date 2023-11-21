@@ -5,6 +5,9 @@ const environmentSchema = {
     PORT: {
       type: "string",
     },
+    MONGO_URI: {
+      type: "string",
+    },
   },
 };
 

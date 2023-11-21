@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import registeredPlugIn from "./main.plugin";
+import { FastifyMongoNestedObject, FastifyMongoObject } from "@fastify/mongodb";
 
 const fastify = Fastify({ logger: true });
 
@@ -8,7 +9,9 @@ declare module "fastify" {
   interface FastifyInstance {
     envConfig: {
       PORT: string;
+      MONGO_URI: string;
     };
+    mongo: FastifyMongoObject & FastifyMongoNestedObject;
   }
 }
 
