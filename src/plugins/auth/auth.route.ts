@@ -2,14 +2,13 @@ import { FastifyInstance } from "fastify";
 
 export function authRoutes(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (req, res) {
-    const test = this.mongo.client.db("test_db");
-    if (test) {
-      console.log("changing database");
-      await test.collection("test").insertOne({
-        name: "Ankit",
-        age: 12,
-      });
-    }
-    return "This message is from auth route";
+    const token = fastifyInstance.jwt.sign({ name: "user" });
+    res
+      .setCookie("auth", token, {
+        httpOnly: true,
+        maxAge: 60 * 60,
+        secure: true,
+      })
+      .send("A cookie is set");
   });
 }
