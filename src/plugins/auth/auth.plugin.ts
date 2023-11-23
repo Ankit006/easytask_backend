@@ -1,10 +1,11 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
-import { AuthPlugInOptionType } from "../../types";
+
 import { authRoutes } from "./auth.route";
+import { AuthPluginOptionType } from "../../types";
 
 export default function authPlugin(
   fastifyInstance: FastifyInstance,
-  _opts: AuthPlugInOptionType,
+  _opts: AuthPluginOptionType,
   done: DoneFuncWithErrOrRes
 ) {
   // auth route

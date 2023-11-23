@@ -50,4 +50,9 @@ export default async function registeredPlugIn(
   fastifyInstance.register(require("./plugins/auth/auth.plugin"), {
     prefix: "/auth",
   });
+
+  // Company plugin
+  fastifyInstance.register(require("./plugins/company/company.plugin"), {
+    prefix: "/company",
+  });
 }

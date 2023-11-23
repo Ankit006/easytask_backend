@@ -41,3 +41,10 @@ export const loginBodyValidation = z.object({
   email: z.string().email(),
   password: z.string(),
 });
+
+export const companyBody = z.object({
+  name: z.string(),
+  address: z.string(),
+  country: z.string(),
+  pinCode: z.string(),
+});

@@ -3,6 +3,10 @@ import { SignUpBodySchema } from "../validation";
 
 export type singUpBodyType = z.infer<typeof SignUpBodySchema>;
 
-export type AuthPlugInOptionType = {
+interface BaseOptionTypes {
   prefix: string;
-};
+}
+
+export interface AuthPluginOptionType extends BaseOptionTypes {}
+
+export interface CompanyPluginOptionType extends BaseOptionTypes {}
