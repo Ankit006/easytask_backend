@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import fastifyEnv from "@fastify/env";
-import environmentSchema from "./schema/environment.schema";
+import { environmentSchema } from "./validation";
 import DBClient from "./database/dbClient";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { FastifyJWTOptions } from "@fastify/jwt";
@@ -34,6 +34,9 @@ export default async function registeredPlugIn(
   fastifyInstance.register(require("@fastify/jwt"), {
     secret: fastifyInstance.envConfig.TOKEN_SECRET,
   } as FastifyJWTOptions);
+
+  // fastify sensible plugin
+  fastifyInstance.register(require("@fastify/sensible"));
 
   // Fastify cookie plugin
   fastifyInstance.register(require("@fastify/cookie"), {
