@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { SignUpBodySchema, loginBodyValidation } from "../../validation";
 import { UserType } from "../../database/database.schema";
 import argon2 from "argon2";
+import { HttpStatus, zodErrorFormatter } from "../../utils";
 
 export function authRoutes(fastifyInstance: FastifyInstance) {
   // Signin user
@@ -33,16 +34,22 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
               secure: true,
             })
 
-            .status(201)
+            .status(HttpStatus.CREATED)
             .send({ mesasge: "Login successful" });
         } else {
-          return reply.notFound("Please provide correct email or password");
+          return reply
+            .status(HttpStatus.NOT_FOUND)
+            .send({ message: "Please provide correct email or password" });
         }
       } else {
-        return reply.notFound("Please provide correct email or password");
+        return reply
+          .status(HttpStatus.NOT_FOUND)
+          .send({ message: "Please provide correct email or password" });
       }
     } else {
-      return validUserData.error;
+      return reply
+        .status(HttpStatus.UNPROCESSABLE_ENTITY)
+        .send(zodErrorFormatter(validUserData.error.errors));
     }
   });
 
@@ -75,13 +82,17 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
             secure: true,
           })
 
-          .status(201)
+          .status(HttpStatus.CREATED)
           .send({ mesasge: "Account created successfuly" });
       } catch (err) {
-        return reply.send("There are some issue with database");
+        return reply
+          .status(HttpStatus.BAD_GATEWAY)
+          .send({ error: "There are some issue with database" });
       }
     } else {
-      return validUserData.error;
+      return reply
+        .status(HttpStatus.UNPROCESSABLE_ENTITY)
+        .send(zodErrorFormatter(validUserData.error.errors));
     }
   });
 }

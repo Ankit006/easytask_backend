@@ -3,7 +3,6 @@ import registeredPlugIn from "./main.plugin";
 import { FastifyMongoNestedObject, FastifyMongoObject } from "@fastify/mongodb";
 import DBClient from "./database/dbClient";
 import { JWT } from "@fastify/jwt";
-import { HttpErrors } from "@fastify/sensible";
 
 const fastify = Fastify({ logger: true });
 
@@ -20,7 +19,6 @@ declare module "fastify" {
     DBClient: DBClient;
     mongo: FastifyMongoObject & FastifyMongoNestedObject;
     jwt: JWT;
-    httpErrors: HttpErrors;
   }
 }
 

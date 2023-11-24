@@ -42,7 +42,7 @@ export const loginBodyValidation = z.object({
   password: z.string(),
 });
 
-export const companyBody = z.object({
+export const companyBodyValidation = z.object({
   name: z.string(),
   address: z.string(),
   country: z.string(),

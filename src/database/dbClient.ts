@@ -6,8 +6,9 @@ import { UserType } from "./database.schema";
 export default class DBClient {
   private fastifyInstance: FastifyInstance;
 
-  private routes = {
+  private collection = {
     user: "user",
+    company: "company",
   };
 
   constructor(fastifyInstance: FastifyInstance) {
@@ -28,7 +29,15 @@ export default class DBClient {
    * @returns user collection
    */
   userCollection() {
-    return this.getClient().collection(this.routes.user);
+    return this.getClient().collection(this.collection.user);
+  }
+
+  /**
+   *
+   * @returns company collection
+   */
+  companyCollection() {
+    return this.getClient().collection(this.collection.company);
   }
 
   async generateUserObject(userData: singUpBodyType) {

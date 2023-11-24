@@ -35,9 +35,6 @@ export default async function registeredPlugIn(
     secret: fastifyInstance.envConfig.TOKEN_SECRET,
   } as FastifyJWTOptions);
 
-  // fastify sensible plugin
-  fastifyInstance.register(require("@fastify/sensible"));
-
   // Fastify cookie plugin
   fastifyInstance.register(require("@fastify/cookie"), {
     secret: fastifyInstance.envConfig.COOKIE_SECRET,
