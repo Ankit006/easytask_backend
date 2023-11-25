@@ -48,8 +48,6 @@ export default async function registeredPlugIn(
     prefix: "/auth",
   });
 
-  // Company plugin
-  fastifyInstance.register(require("./plugins/company/company.plugin"), {
-    prefix: "/company",
-  });
+  // This plugin holds routes (or I should say plugin 🧐) that requires authorization.
+  fastifyInstance.register(require("./plugins/guard/private.plugin"));
 }

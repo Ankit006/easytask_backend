@@ -23,19 +23,9 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
         );
 
         if (validatePass) {
-          // generate a new jwt token
-          const token = fastifyInstance.jwt.sign({ userId: user._id });
-
-          // set Cookie and send response
           reply
-            .setCookie("auth", token, {
-              httpOnly: true,
-              maxAge: 60 * 60,
-              secure: true,
-            })
-
-            .status(HttpStatus.CREATED)
-            .send({ mesasge: "Login successful" });
+            .status(HttpStatus.SUCCESS)
+            .send({ mesasge: "Login successful", user });
         } else {
           return reply
             .status(HttpStatus.NOT_FOUND)
@@ -67,23 +57,11 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
         );
 
         // inserting new user object to user coolection
-        const res = await fastifyInstance.DBClient.userCollection().insertOne(
-          userData
-        );
+        await fastifyInstance.DBClient.userCollection().insertOne(userData);
 
-        // generate jwt token and the payload is user objectId
-        const token = fastifyInstance.jwt.sign({ userId: res.insertedId });
-
-        // set JWT to the HTTPOnly cookie and send response
         reply
-          .setCookie("auth", token, {
-            httpOnly: true,
-            maxAge: 60 * 60,
-            secure: true,
-          })
-
           .status(HttpStatus.CREATED)
-          .send({ mesasge: "Account created successfuly" });
+          .send({ mesasge: "Account created successfuly", user: userData });
       } catch (err) {
         return reply
           .status(HttpStatus.BAD_GATEWAY)

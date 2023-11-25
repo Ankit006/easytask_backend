@@ -18,4 +18,5 @@ export const HttpStatus = {
   BAD_GATEWAY: 502,
   BAD_REQUEST: 400,
   UNPROCESSABLE_ENTITY: 422,
+  UNAUTHORIZED: 401,
 };

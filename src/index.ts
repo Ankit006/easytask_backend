@@ -19,6 +19,13 @@ declare module "fastify" {
     DBClient: DBClient;
     mongo: FastifyMongoObject & FastifyMongoNestedObject;
     jwt: JWT;
+    userID: string;
+  }
+
+  //  this userId only avilable for routes (or plugins ) under private.plugin.ts after routes are
+  // successfully authorized
+  interface FastifyRequest {
+    userId: string;
   }
 }
 

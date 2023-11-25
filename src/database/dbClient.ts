@@ -32,14 +32,6 @@ export default class DBClient {
     return this.getClient().collection(this.collection.user);
   }
 
-  /**
-   *
-   * @returns company collection
-   */
-  companyCollection() {
-    return this.getClient().collection(this.collection.company);
-  }
-
   async generateUserObject(userData: singUpBodyType) {
     const hashedPassword = await argon2.hash(userData.password);
     const userObject: Partial<UserType> = {
@@ -48,5 +40,13 @@ export default class DBClient {
       isActive: true,
     };
     return userObject;
+  }
+
+  /**
+   *
+   * @returns company collection
+   */
+  companyCollection() {
+    return this.getClient().collection(this.collection.company);
   }
 }
