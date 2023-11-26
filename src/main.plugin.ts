@@ -42,6 +42,9 @@ export default async function registeredPlugIn(
     parseOptions: {},
   } as FastifyCookieOptions);
 
+  // fastify websocket plugin
+  fastifyInstance.register(require("@fastify/websocket"));
+
   // Auth Plugin
   // This plugin is for signIn, signUp
   fastifyInstance.register(require("./plugins/auth/auth.plugin"), {
