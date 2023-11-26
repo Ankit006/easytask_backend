@@ -10,5 +10,5 @@ export type UserType = z.infer<typeof SignUpBodySchema> & {
 export type CompanyType = z.infer<typeof companyBodyValidation> & {
   _id: ObjectId;
   adminId: string;
-  members: ObjectId[];
+  members: string[];
 };

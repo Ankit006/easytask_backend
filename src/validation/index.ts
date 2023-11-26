@@ -1,3 +1,4 @@
+import { ObjectId } from "@fastify/mongodb";
 import { z } from "zod";
 
 // @fastify/env schema for env files
@@ -47,4 +48,10 @@ export const companyBodyValidation = z.object({
   address: z.string(),
   country: z.string(),
   pinCode: z.string(),
+});
+
+export const companyMemberAssignBodyvalidation = z.object({
+  memberId: z.string().refine((value) => ObjectId.isValid(value), {
+    message: "memberId is not a valid Id",
+  }),
 });

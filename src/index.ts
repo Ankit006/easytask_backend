@@ -22,10 +22,13 @@ declare module "fastify" {
     userID: string;
   }
 
-  //  this userId only avilable for routes (or plugins ) under private.plugin.ts after routes are
-  // successfully authorized
   interface FastifyRequest {
+    //  this userId only avilable for routes (or plugins ) under private.plugin.ts after routes are
+    // successfully authorized
     userId: string;
+
+    // companyId is avilable under company_admin.plugin.ts
+    companyId: string;
   }
 }
 

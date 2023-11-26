@@ -1,6 +1,7 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
 import { BaseOptionTypes, JwtVerifyPayloadType } from "../../types";
 import { HttpStatus } from "../../utils";
+import { ObjectId } from "@fastify/mongodb";
 
 export default function privateGuardPlugin(
   fastifyInstance: FastifyInstance,
@@ -9,11 +10,19 @@ export default function privateGuardPlugin(
 ) {
   fastifyInstance.decorateRequest("userId", "");
 
-  fastifyInstance.addHook("preHandler", function (request, reply, done) {
+  fastifyInstance.addHook("preHandler", async function (request, reply) {
     const cookies = request.cookies;
     if (cookies["auth"]) {
       try {
         const res = this.jwt.verify<JwtVerifyPayloadType>(cookies["auth"]);
+        const user = await this.DBClient.userCollection().findOne({
+          _id: new ObjectId(res.userId),
+        });
+        if (!user) {
+          return reply
+            .status(HttpStatus.UNAUTHORIZED)
+            .send({ message: "UNAUTHORIZED ACCESS" });
+        }
         request.userId = res.userId;
       } catch (err) {
         return reply
@@ -25,7 +34,6 @@ export default function privateGuardPlugin(
         .status(HttpStatus.UNAUTHORIZED)
         .send({ message: "UNAUTHORIZED ACCESS" });
     }
-    done();
   });
 
   // company plugin
