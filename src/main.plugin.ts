@@ -42,8 +42,8 @@ export default async function registeredPlugIn(
     parseOptions: {},
   } as FastifyCookieOptions);
 
-  // fastify websocket plugin
-  fastifyInstance.register(require("@fastify/websocket"));
+  fastifyInstance.register(require("fastify-socket.io"));
+  await fastifyInstance.after();
 
   // Auth Plugin
   // This plugin is for signIn, signUp
@@ -53,4 +53,8 @@ export default async function registeredPlugIn(
 
   // This plugin holds routes (or I should say plugin 🧐) that requires authorization.
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
+
+  fastifyInstance.get("/ws", (req, reply) => {
+    fastifyInstance.io.emit("hello");
+  });
 }

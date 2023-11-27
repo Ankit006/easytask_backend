@@ -3,6 +3,7 @@ import registeredPlugIn from "./main.plugin";
 import { FastifyMongoNestedObject, FastifyMongoObject } from "@fastify/mongodb";
 import DBClient from "./database/dbClient";
 import { JWT } from "@fastify/jwt";
+import { Socket } from "socket.io";
 
 const fastify = Fastify({ logger: true });
 
@@ -20,6 +21,7 @@ declare module "fastify" {
     mongo: FastifyMongoObject & FastifyMongoNestedObject;
     jwt: JWT;
     userID: string;
+    io: Socket;
   }
 
   interface FastifyRequest {
@@ -29,6 +31,10 @@ declare module "fastify" {
 
     // companyId is avilable under company_admin.plugin.ts
     companyId: string;
+  }
+
+  interface RouteShorthandOptions {
+    websocket?: boolean;
   }
 }
 
