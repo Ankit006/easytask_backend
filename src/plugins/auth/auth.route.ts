@@ -48,7 +48,6 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
   fastifyInstance.post("/signup", async function (request, reply) {
     // validate user body
     const validUserData = SignUpBodySchema.safeParse(request.body);
-
     if (validUserData.success) {
       try {
         // Generate user object (this method also handle password hashing adding it to the new user object)
@@ -58,7 +57,7 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
 
         // inserting new user object to user coolection
         await fastifyInstance.DBClient.userCollection().insertOne(userData);
-
+        delete userData.password;
         reply
           .status(HttpStatus.CREATED)
           .send({ mesasge: "Account created successfuly", user: userData });

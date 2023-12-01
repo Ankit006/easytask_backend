@@ -5,6 +5,8 @@ import DBClient from "./database/dbClient";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { FastifyJWTOptions } from "@fastify/jwt";
 import { FastifyMongodbOptions } from "@fastify/mongodb";
+import { Socket } from "socket.io";
+import { FastifyCorsOptions } from "@fastify/cors";
 
 export default async function registeredPlugIn(
   fastifyInstance: FastifyInstance
@@ -42,6 +44,12 @@ export default async function registeredPlugIn(
     parseOptions: {},
   } as FastifyCookieOptions);
 
+  fastifyInstance.register(require("@fastify/cors"), {
+    origin: fastifyInstance.envConfig.FRONTEND_URL,
+    credentials: true,
+  } as FastifyCorsOptions);
+  await fastifyInstance.after();
+
   fastifyInstance.register(require("fastify-socket.io"));
   await fastifyInstance.after();
 
@@ -54,7 +62,15 @@ export default async function registeredPlugIn(
   // This plugin holds routes (or I should say plugin 🧐) that requires authorization.
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
 
-  fastifyInstance.get("/ws", (req, reply) => {
-    fastifyInstance.io.emit("hello");
+  // listening to socket connection
+  fastifyInstance.io.on("connection", (socket: Socket) => {
+    console.log(socket.id);
+    socket.emit("data", "hey");
+    socket.on("chat", (arg1, arg2, callback) => {
+      console.log("hey", arg1, arg2);
+    });
+    socket.on("disconnect", () => {
+      console.log("user disconnected");
+    });
   });
 }

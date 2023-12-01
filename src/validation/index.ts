@@ -22,6 +22,12 @@ export const environmentSchema = {
     COOKIE_SECRET: {
       type: "string",
     },
+    APP_URL: {
+      type: "string",
+    },
+    FRONTEND_URL: {
+      type: "string",
+    },
   },
 };
 

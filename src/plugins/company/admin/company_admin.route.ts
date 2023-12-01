@@ -2,7 +2,10 @@ import { FastifyInstance } from "fastify";
 import { companyMemberAssignBodyvalidation } from "../../../validation";
 import { HttpStatus, zodErrorFormatter } from "../../../utils";
 import { ObjectId } from "@fastify/mongodb";
-import { CompanyType } from "../../../database/database.schema";
+import {
+  CompanyType,
+  NotificationType,
+} from "../../../database/database.schema";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (req, reply) {
@@ -43,8 +46,20 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
           .send({ error: "This user already member of this company" });
       }
 
-      // Now insert memberId to the company members array
+      // send a notification to the user
+      const newNotification: NotificationType = {
+        type: "CONFIRMATION",
+        message: "Do you want to join this company?",
+        links: {
+          accept: "",
+          decline: "",
+        },
+        isViewed: false,
+        userId: new ObjectId(),
+        companyId: new ObjectId(),
+      };
 
+      // Now insert memberId to the company members array
       const res = await this.DBClient.companyCollection().updateOne(
         { _id: new ObjectId(req.companyId) },
         {

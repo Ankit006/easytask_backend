@@ -16,6 +16,8 @@ declare module "fastify" {
       DB: string;
       TOKEN_SECRET: string;
       COOKIE_SECRET: string;
+      APP_URL: string;
+      FRONTEND_URL: string;
     };
     DBClient: DBClient;
     mongo: FastifyMongoObject & FastifyMongoNestedObject;

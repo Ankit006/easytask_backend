@@ -23,9 +23,12 @@ export default function authPlugin(
       const user: UserType = JSON.parse(payload).user;
       const token = this.jwt.sign({ userId: user._id });
       reply.setCookie("auth", token, {
+        domain: "localhost",
+        path: "/",
+        secure: true,
+        sameSite: "lax",
         httpOnly: true,
         maxAge: 60 * 60,
-        secure: true,
       });
     }
     done();

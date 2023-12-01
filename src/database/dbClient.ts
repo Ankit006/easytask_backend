@@ -9,6 +9,7 @@ export default class DBClient {
   private collection = {
     user: "user",
     company: "company",
+    notification: "notification",
   };
 
   constructor(fastifyInstance: FastifyInstance) {
@@ -24,10 +25,6 @@ export default class DBClient {
     );
   }
 
-  /**
-   *
-   * @returns user collection
-   */
   userCollection() {
     return this.getClient().collection(this.collection.user);
   }
@@ -42,11 +39,11 @@ export default class DBClient {
     return userObject;
   }
 
-  /**
-   *
-   * @returns company collection
-   */
   companyCollection() {
     return this.getClient().collection(this.collection.company);
+  }
+
+  notificationCollection() {
+    return this.getClient().collection(this.collection.notification);
   }
 }
