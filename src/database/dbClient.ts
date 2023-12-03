@@ -7,7 +7,7 @@ export default class DBClient {
   private fastifyInstance: FastifyInstance;
 
   private collection = {
-    user: "user",
+    users: "users",
     company: "company",
     notification: "notification",
   };
@@ -19,14 +19,14 @@ export default class DBClient {
   /**
    * @returns mongoDB client
    */
-  getClient() {
+  private getClient() {
     return this.fastifyInstance.mongo.client.db(
       this.fastifyInstance.envConfig.DB
     );
   }
 
   userCollection() {
-    return this.getClient().collection(this.collection.user);
+    return this.getClient().collection(this.collection.users);
   }
 
   async generateUserObject(userData: singUpBodyType) {

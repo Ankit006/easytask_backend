@@ -2,7 +2,11 @@ import { FastifyInstance } from "fastify";
 import { SignUpBodySchema, loginBodyValidation } from "../../validation";
 import { UserType } from "../../database/database.schema";
 import argon2 from "argon2";
-import { HttpStatus, zodErrorFormatter } from "../../utils";
+import {
+  HttpStatus,
+  mongoErrorFormatter,
+  zodErrorFormatter,
+} from "../../utils";
 
 export function authRoutes(fastifyInstance: FastifyInstance) {
   // Signin user
@@ -29,12 +33,12 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
         } else {
           return reply
             .status(HttpStatus.NOT_FOUND)
-            .send({ message: "Please provide correct email or password" });
+            .send({ error: "Please provide correct email or password" });
         }
       } else {
         return reply
           .status(HttpStatus.NOT_FOUND)
-          .send({ message: "Please provide correct email or password" });
+          .send({ error: "Please provide correct email or password" });
       }
     } else {
       return reply
@@ -50,6 +54,7 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
     const validUserData = SignUpBodySchema.safeParse(request.body);
     if (validUserData.success) {
       try {
+        // check if user with this email already exist (because email must be unique)
         // Generate user object (this method also handle password hashing adding it to the new user object)
         const userData = await this.DBClient.generateUserObject(
           validUserData.data
@@ -61,10 +66,10 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
         reply
           .status(HttpStatus.CREATED)
           .send({ mesasge: "Account created successfuly", user: userData });
-      } catch (err) {
+      } catch (err: any) {
         return reply
           .status(HttpStatus.BAD_GATEWAY)
-          .send({ error: "There are some issue with database" });
+          .send(mongoErrorFormatter(err));
       }
     } else {
       return reply
