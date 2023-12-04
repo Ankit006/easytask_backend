@@ -4,7 +4,22 @@ import { HttpStatus, zodErrorFormatter } from "../../utils";
 import { CompanyType } from "../../database/database.schema";
 
 export function companyRoutes(fastifyInstance: FastifyInstance) {
-  fastifyInstance.post("/create", async function (req, reply) {
+  fastifyInstance.get("/", async function (request, reply) {
+    try {
+      const companyList = await this.DBClient.companyCollection()
+        .find<CompanyType>({
+          adminId: request.userId,
+        })
+        .toArray();
+      return reply.send(companyList);
+    } catch (err) {
+      return reply
+        .status(HttpStatus.BAD_GATEWAY)
+        .send({ error: "Oops, its looks like there are server issues😟" });
+    }
+  });
+
+  fastifyInstance.post("/", async function (req, reply) {
     const validCompanyData = companyBodyValidation.safeParse(req.body);
     if (validCompanyData.success) {
       try {
@@ -21,7 +36,7 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
       } catch (err) {
         return reply
           .status(HttpStatus.BAD_GATEWAY)
-          .send({ message: "Oops, its looks like there are server issues😟" });
+          .send({ error: "Oops, its looks like there are server issues😟" });
       }
     } else {
       return reply
