@@ -21,6 +21,7 @@ export default function authPlugin(
       typeof payload === "string"
     ) {
       const user: UserType = JSON.parse(payload).user;
+
       const token = this.jwt.sign({ userId: user._id });
       reply.setCookie("auth", token, {
         domain: "localhost",
@@ -28,7 +29,7 @@ export default function authPlugin(
         secure: true,
         sameSite: "lax",
         httpOnly: true,
-        maxAge: 60 * 60,
+        maxAge: 24 * 60 * 60,
       });
     }
     done();
