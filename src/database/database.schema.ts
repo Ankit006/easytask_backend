@@ -11,6 +11,7 @@ export type CompanyType = z.infer<typeof companyBodyValidation> & {
   _id: ObjectId;
   adminId: string;
   members: string[];
+  logoPublicId: string | null;
 };
 
 export interface NotificationType {

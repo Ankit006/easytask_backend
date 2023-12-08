@@ -28,6 +28,15 @@ export const environmentSchema = {
     FRONTEND_URL: {
       type: "string",
     },
+    CLOUDENARY_API_KEY: {
+      type: "string",
+    },
+    CLOUDENARY_CLOUD: {
+      type: "string",
+    },
+    CLOUDENARY_SECRET: {
+      type: "string",
+    },
   },
 };
 
@@ -50,6 +59,7 @@ export const loginBodyValidation = z.object({
 });
 
 export const companyBodyValidation = z.object({
+  profileImage: z.any(),
   name: z.string(),
   address: z.string(),
   country: z.string(),

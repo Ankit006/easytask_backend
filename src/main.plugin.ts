@@ -7,11 +7,13 @@ import { FastifyJWTOptions } from "@fastify/jwt";
 import { FastifyMongodbOptions } from "@fastify/mongodb";
 import { Socket } from "socket.io";
 import { FastifyCorsOptions } from "@fastify/cors";
+import cloudinaryConfig from "./cloudinary/cloudinaryConfig";
 
+//  This function holds all global register plugin and decorators
 export default async function registeredPlugIn(
   fastifyInstance: FastifyInstance
 ) {
-  // ENV plugin
+  /////////////////////////////////// ENV plugin    /////////////////////////////////////////////////
   fastifyInstance.register(fastifyEnv, {
     confKey: "envConfig",
     schema: environmentSchema,
@@ -19,7 +21,7 @@ export default async function registeredPlugIn(
   });
   await fastifyInstance.after();
 
-  // // Connect to mongodb
+  //////////////////////////////////// mongodb connection //////////////////////////////////////////////////////////////
   fastifyInstance.register(require("@fastify/mongodb"), {
     forceClose: true,
     url: fastifyInstance.envConfig.MONGO_URI,
@@ -27,40 +29,51 @@ export default async function registeredPlugIn(
 
   await fastifyInstance.after();
 
+  /**
+   *  ------------------------------------- DBClient Decorator -------------------------------------------
+   */
+
   // This decorator is used to easily access DB client.
   // You don't have to write this  "fastifyInstance.mongo.client.db('yourdb')" every time if you want
   // to access to client.
   fastifyInstance.decorate("DBClient", new DBClient(fastifyInstance));
 
-  // Fastify jwt plugin
+  ///////////////////////////////// jsonwebtoken plugin ////////////////////////////////////////////////
   fastifyInstance.register(require("@fastify/jwt"), {
     secret: fastifyInstance.envConfig.TOKEN_SECRET,
   } as FastifyJWTOptions);
 
-  // Fastify cookie plugin
+  /////////////////////////// cookie plugin ///////////////////////////////////////////////////////////////////
   fastifyInstance.register(require("@fastify/cookie"), {
     secret: fastifyInstance.envConfig.COOKIE_SECRET,
     hook: "onRequest",
     parseOptions: {},
   } as FastifyCookieOptions);
 
+  /////////////////////////////// CORS plugin /////////////////////////////////////////////////////////////////////////////
   fastifyInstance.register(require("@fastify/cors"), {
     origin: fastifyInstance.envConfig.FRONTEND_URL,
     credentials: true,
   } as FastifyCorsOptions);
   await fastifyInstance.after();
 
+  /////////////////////////////// socket io plugin ///////////////////////////////////////////////////////////////////////////
   fastifyInstance.register(require("fastify-socket.io"));
   await fastifyInstance.after();
 
-  // Auth Plugin
-  // This plugin is for signIn, signUp
+  /////////////////////////////// authentation plugin /////////////////////////////////////////////////////////////////////////////
   fastifyInstance.register(require("./plugins/auth/auth.plugin"), {
     prefix: "/auth",
   });
 
-  // This plugin holds routes (or I should say plugin 🧐) that requires authorization.
+  ////////////////////////////////// private routes plugin  (routes under this plugin requires authorization.) /////////////////////////////////////////////////
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
+
+  /**
+   *  ----------------------------- Cloudinary client decorator --------------------------
+   */
+
+  fastifyInstance.decorate("cloudinary", cloudinaryConfig(fastifyInstance));
 
   // listening to socket connection
   fastifyInstance.io.on("connection", (socket: Socket) => {

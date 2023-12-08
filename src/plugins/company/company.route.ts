@@ -23,11 +23,28 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
     const validCompanyData = companyBodyValidation.safeParse(req.body);
     if (validCompanyData.success) {
       try {
+        let logoPublicId: string | null = null;
+
+        // upload profile image to cloudinary
+        if (validCompanyData.data.profileImage) {
+          const result = await fastifyInstance.cloudinary.uploader.upload(
+            validCompanyData.data.profileImage,
+            {
+              use_filename: true,
+              folder: "company",
+              overwrite: true,
+            }
+          );
+          logoPublicId = result.public_id;
+        }
+
         const companyObj: Partial<CompanyType> = {
           ...validCompanyData.data,
           adminId: req.userId,
           members: [],
+          logoPublicId,
         };
+
         await this.DBClient.companyCollection().insertOne(companyObj);
         return reply.status(HttpStatus.CREATED).send({
           message: "New company added successfuly",
