@@ -1,5 +1,5 @@
 import { ObjectId } from "@fastify/mongodb";
-import { z } from "zod";
+import { ZodObject, ZodString, string, z } from "zod";
 
 // @fastify/env schema for env files
 export const environmentSchema = {
@@ -28,13 +28,13 @@ export const environmentSchema = {
     FRONTEND_URL: {
       type: "string",
     },
-    CLOUDENARY_API_KEY: {
+    IMAGEKIT_PUBLIC_KEY: {
       type: "string",
     },
-    CLOUDENARY_CLOUD: {
+    IMAGEKIT_PRIVATE_KEY: {
       type: "string",
     },
-    CLOUDENARY_SECRET: {
+    IMAGEKIT_URL_ENDPOINT: {
       type: "string",
     },
   },
@@ -59,7 +59,6 @@ export const loginBodyValidation = z.object({
 });
 
 export const companyBodyValidation = z.object({
-  profileImage: z.any(),
   name: z.string(),
   address: z.string(),
   country: z.string(),

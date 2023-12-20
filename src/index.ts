@@ -4,7 +4,8 @@ import { FastifyMongoNestedObject, FastifyMongoObject } from "@fastify/mongodb";
 import DBClient from "./database/dbClient";
 import { JWT } from "@fastify/jwt";
 import { Socket } from "socket.io";
-import Cloudinary from "cloudinary";
+import {} from "@fastify/multipart";
+import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
 
 const fastify = Fastify({ logger: true });
 
@@ -19,16 +20,16 @@ declare module "fastify" {
       COOKIE_SECRET: string;
       APP_URL: string;
       FRONTEND_URL: string;
-      CLOUDENARY_API_KEY: string;
-      CLOUDENARY_CLOUD: string;
-      CLOUDENARY_SECRET: string;
+      IMAGEKIT_PUBLIC_KEY: string;
+      IMAGEKIT_PRIVATE_KEY: string;
+      IMAGEKIT_URL_ENDPOINT: string;
     };
     DBClient: DBClient;
     mongo: FastifyMongoObject & FastifyMongoNestedObject;
     jwt: JWT;
     userID: string;
     io: Socket;
-    cloudinary: typeof Cloudinary.v2;
+    imageStorage: ImageStorage;
   }
 
   interface FastifyRequest {

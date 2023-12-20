@@ -7,13 +7,17 @@ export type UserType = z.infer<typeof SignUpBodySchema> & {
   isActive: boolean;
 };
 
+export type ImageStore = {
+  url: string;
+  fileId: string;
+} | null;
+
 export type CompanyType = z.infer<typeof companyBodyValidation> & {
   _id: ObjectId;
   adminId: string;
   members: string[];
-  logoPublicId: string | null;
+  logo: ImageStore;
 };
-
 export interface NotificationType {
   type: "CONFIRMATION" | "MESSAGE";
   message: string;

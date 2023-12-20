@@ -7,8 +7,7 @@ import { FastifyJWTOptions } from "@fastify/jwt";
 import { FastifyMongodbOptions } from "@fastify/mongodb";
 import { Socket } from "socket.io";
 import { FastifyCorsOptions } from "@fastify/cors";
-import cloudinaryConfig from "./cloudinary/cloudinaryConfig";
-
+import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
 //  This function holds all global register plugin and decorators
 export default async function registeredPlugIn(
   fastifyInstance: FastifyInstance
@@ -69,11 +68,7 @@ export default async function registeredPlugIn(
   ////////////////////////////////// private routes plugin  (routes under this plugin requires authorization.) /////////////////////////////////////////////////
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
 
-  /**
-   *  ----------------------------- Cloudinary client decorator --------------------------
-   */
-
-  fastifyInstance.decorate("cloudinary", cloudinaryConfig(fastifyInstance));
+  fastifyInstance.decorate("imageStorage", new ImageStorage(fastifyInstance));
 
   // listening to socket connection
   fastifyInstance.io.on("connection", (socket: Socket) => {
