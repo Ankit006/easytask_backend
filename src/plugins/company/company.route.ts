@@ -33,13 +33,24 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
   });
 
   fastifyInstance.post("/", async function (req, reply) {
-    // data will be undefiled if user not send any file
-
     const validatedBody = CompanyFileFormValidation.safeParse(req.body);
 
     if (validatedBody.success) {
       try {
-        let logo: ImageStore = null;
+        //  check company with this name already exist or not
+        const company = await this.DBClient.companyCollection().findOne({
+          name: validatedBody.data.name.value.toLowerCase(),
+        });
+        if (company) {
+          return reply
+            .status(HttpStatus.CONFLICT)
+            .send({ error: "A company with this name already exist" });
+        }
+
+        let logo: ImageStore | null = null;
+
+        // if user send a company logo then save the logo in imagekit and save url and imageId
+        // into logo variable
         if (validatedBody.data.file) {
           const buffer = await validatedBody.data.file.toBuffer();
           const res = await this.imageStorage.uploadImage(
@@ -51,8 +62,10 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
             url: res.url,
           };
         }
+
+        // save company data and send response
         const companyData: Partial<CompanyType> = {
-          name: validatedBody.data.name.value,
+          name: validatedBody.data.name.value.toLowerCase(),
           adminId: req.userId,
           logo,
           pinCode: validatedBody.data.pinCode.value,
@@ -72,43 +85,5 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
         .status(HttpStatus.BAD_REQUEST)
         .send({ error: "Cannot read the form data" });
     }
-    // if (data) {
-    //   const file = data.file;
-    //   const fields = data.fields;
-    //   const validCompanyData = companyBodyValidation.safeParse(fields);
-
-    //   if (validCompanyData.success) {
-    //     try {
-    //       let logoPublicId: string | null = null;
-
-    //       const companyObj: Partial<CompanyType> = {
-    //         ...validCompanyData.data,
-    //         adminId: req.userId,
-    //         members: [],
-    //         logoPublicId,
-    //       };
-
-    //       await this.DBClient.companyCollection().insertOne(companyObj);
-    //       return reply.status(HttpStatus.CREATED).send({
-    //         message: "New company added successfuly",
-    //         company: companyObj,
-    //       });
-    //     } catch (err) {
-    //       return reply.status(HttpStatus.BAD_GATEWAY).send({
-    //         error: "Oops, its looks like there are server issues😟",
-    //       });
-    //     }
-    //   } else {
-    //     return reply
-    //       .status(HttpStatus.UNPROCESSABLE_ENTITY)
-    //       .send(zodErrorFormatter(validCompanyData.error.errors));
-    //   }
-    // } else {
-    //   return reply
-    //     .status(HttpStatus.BAD_REQUEST)
-    //     .send({ error: "Cannot read the form data" });
-    // }
-
-    // If data is undefined than that means user is sending a JSON data
   });
 }

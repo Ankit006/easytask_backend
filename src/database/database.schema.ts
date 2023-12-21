@@ -10,13 +10,13 @@ export type UserType = z.infer<typeof SignUpBodySchema> & {
 export type ImageStore = {
   url: string;
   fileId: string;
-} | null;
+};
 
 export type CompanyType = z.infer<typeof companyBodyValidation> & {
   _id: ObjectId;
   adminId: string;
   members: string[];
-  logo: ImageStore;
+  logo: ImageStore | null;
 };
 export interface NotificationType {
   type: "CONFIRMATION" | "MESSAGE";

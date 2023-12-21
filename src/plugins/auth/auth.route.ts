@@ -55,6 +55,14 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
     if (validUserData.success) {
       try {
         // check if user with this email already exist (because email must be unique)
+        const user = await this.DBClient.userCollection().findOne({
+          email: validUserData.data.email,
+        });
+        if (user) {
+          return reply
+            .status(HttpStatus.CONFLICT)
+            .send({ error: "A user with this email already exist" });
+        }
         // Generate user object (this method also handle password hashing adding it to the new user object)
         const userData = await this.DBClient.generateUserObject(
           validUserData.data
