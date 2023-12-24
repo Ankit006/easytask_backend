@@ -2,22 +2,23 @@ import { z } from "zod";
 import { SignUpBodySchema, companyBodyValidation } from "../validation";
 import { ObjectId } from "@fastify/mongodb";
 
-export type UserType = z.infer<typeof SignUpBodySchema> & {
+export interface IUser extends z.infer<typeof SignUpBodySchema> {
   _id: ObjectId;
   isActive: boolean;
-};
+}
 
-export type ImageStore = {
+export interface ImageStore {
   url: string;
   fileId: string;
-};
+}
 
-export type CompanyType = z.infer<typeof companyBodyValidation> & {
+export interface ICompany extends z.infer<typeof companyBodyValidation> {
   _id: ObjectId;
   adminId: string;
   members: string[];
   logo: ImageStore | null;
-};
+}
+
 export interface NotificationType {
   type: "CONFIRMATION" | "MESSAGE";
   message: string;

@@ -5,7 +5,7 @@ import {
   mongoErrorFormatter,
   zodErrorFormatter,
 } from "../../utils";
-import { CompanyType, ImageStore } from "../../database/database.schema";
+import { ICompany, ImageStore } from "../../database/database.schema";
 import { CompanyFileFormValidation } from "./validation";
 export function companyRoutes(fastifyInstance: FastifyInstance) {
   /////////////////////// fastify multipart /////////////////////////////
@@ -20,7 +20,7 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (request, reply) {
     try {
       const companyList = await this.DBClient.companyCollection()
-        .find<CompanyType>({
+        .find<ICompany>({
           adminId: request.userId,
         })
         .toArray();
@@ -64,7 +64,7 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
         }
 
         // save company data and send response
-        const companyData: Partial<CompanyType> = {
+        const companyData: Partial<ICompany> = {
           name: validatedBody.data.name.value.toLowerCase(),
           adminId: req.userId,
           logo,

@@ -1,5 +1,5 @@
 import { ObjectId } from "@fastify/mongodb";
-import { ZodObject, ZodString, string, z } from "zod";
+import { z } from "zod";
 
 // @fastify/env schema for env files
 export const environmentSchema = {
@@ -39,6 +39,10 @@ export const environmentSchema = {
     },
   },
 };
+
+export interface BaseOptionTypes {
+  prefix: string;
+}
 
 export const SignUpBodySchema = z.object({
   firstName: z.string(),

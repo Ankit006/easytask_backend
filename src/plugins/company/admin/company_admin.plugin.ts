@@ -1,7 +1,7 @@
 import { FastifyInstance, DoneFuncWithErrOrRes } from "fastify";
 import { CompanyPluginOptionType } from "../../../types";
 import companyAdminRoute from "./company_admin.route";
-import { CompanyType } from "../../../database/database.schema";
+import { ICompany } from "../../../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
 import { HttpStatus } from "../../../utils";
 
@@ -14,7 +14,7 @@ export default function companyPlugin(
   fastifyInstance.addHook("preHandler", async function (request, reply) {
     const { companyId } = request.params as { companyId: string };
 
-    const res = await this.DBClient.companyCollection().findOne<CompanyType>({
+    const res = await this.DBClient.companyCollection().findOne<ICompany>({
       _id: new ObjectId(companyId),
       adminId: request.userId,
     });

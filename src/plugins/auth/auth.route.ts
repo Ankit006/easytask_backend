@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { SignUpBodySchema, loginBodyValidation } from "../../validation";
-import { UserType } from "../../database/database.schema";
+import { IUser } from "../../database/database.schema";
 import argon2 from "argon2";
 import {
   HttpStatus,
@@ -15,7 +15,7 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
     if (validUserData.success) {
       // get the user from database
       const user =
-        await fastifyInstance.DBClient.userCollection().findOne<UserType>({
+        await fastifyInstance.DBClient.userCollection().findOne<IUser>({
           email: validUserData.data.email,
         });
       // Check if user exist

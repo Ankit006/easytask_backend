@@ -2,10 +2,7 @@ import { FastifyInstance } from "fastify";
 import { companyMemberAssignBodyvalidation } from "../../../validation";
 import { HttpStatus, zodErrorFormatter } from "../../../utils";
 import { ObjectId } from "@fastify/mongodb";
-import {
-  CompanyType,
-  NotificationType,
-} from "../../../database/database.schema";
+import { ICompany, NotificationType } from "../../../database/database.schema";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (req, reply) {
@@ -26,14 +23,14 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       //  You cannot assign admin as member ( because he/she already is a member of the company.. duh🤷‍♀️).
       // that's why below code check if member id is equal to the logged in user Id (logged in user id is the admin, because this
       // api can only be access by the company admin)
-      validBody.data.memberId === req.userId &&
+      validBody.data.memberId === `${req.userId}` &&
         reply
           .status(HttpStatus.UNPROCESSABLE_ENTITY)
           .send({ error: "Company Admin cannot be assign as member" });
 
       // Fetch company data to check if the member array already contains memberId.
       const companyData =
-        await this.DBClient.companyCollection().findOne<CompanyType>({
+        await this.DBClient.companyCollection().findOne<ICompany>({
           _id: new ObjectId(req.companyId),
         });
 

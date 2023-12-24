@@ -3,7 +3,7 @@ import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
 import { authRoutes } from "./auth.route";
 import { AuthPluginOptionType } from "../../types";
 import { HttpStatus } from "../../utils";
-import { UserType } from "../../database/database.schema";
+import { IUser } from "../../database/database.schema";
 
 export default function authPlugin(
   fastifyInstance: FastifyInstance,
@@ -20,7 +20,7 @@ export default function authPlugin(
         reply.statusCode === HttpStatus.CREATED) &&
       typeof payload === "string"
     ) {
-      const user: UserType = JSON.parse(payload).user;
+      const user: IUser = JSON.parse(payload).user;
 
       const token = this.jwt.sign({ userId: user._id });
       reply.setCookie("auth", token, {

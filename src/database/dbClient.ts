@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import argon2 from "argon2";
 import { singUpBodyType } from "../types";
-import { UserType } from "./database.schema";
+import { IUser } from "./database.schema";
 
 export default class DBClient {
   private fastifyInstance: FastifyInstance;
@@ -31,7 +31,7 @@ export default class DBClient {
 
   async generateUserObject(userData: singUpBodyType) {
     const hashedPassword = await argon2.hash(userData.password);
-    const userObject: Partial<UserType> = {
+    const userObject: Partial<IUser> = {
       ...userData,
       password: hashedPassword,
       isActive: true,

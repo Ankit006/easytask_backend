@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { SignUpBodySchema, companyBodyValidation } from "../validation";
+import {
+  BaseOptionTypes,
+  SignUpBodySchema,
+  companyBodyValidation,
+} from "../validation";
 
 export type singUpBodyType = z.infer<typeof SignUpBodySchema>;
 export type companyBodyType = z.infer<typeof companyBodyValidation>;
-
-export interface BaseOptionTypes {
-  prefix: string;
-}
 
 export interface AuthPluginOptionType extends BaseOptionTypes {}
 
