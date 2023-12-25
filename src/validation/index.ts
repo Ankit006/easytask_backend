@@ -1,4 +1,3 @@
-import { ObjectId } from "@fastify/mongodb";
 import { z } from "zod";
 
 // @fastify/env schema for env files
@@ -22,27 +21,8 @@ export const environmentSchema = {
     COOKIE_SECRET: {
       type: "string",
     },
-    APP_URL: {
-      type: "string",
-    },
-    FRONTEND_URL: {
-      type: "string",
-    },
-    IMAGEKIT_PUBLIC_KEY: {
-      type: "string",
-    },
-    IMAGEKIT_PRIVATE_KEY: {
-      type: "string",
-    },
-    IMAGEKIT_URL_ENDPOINT: {
-      type: "string",
-    },
   },
 };
-
-export interface BaseOptionTypes {
-  prefix: string;
-}
 
 export const SignUpBodySchema = z.object({
   firstName: z.string(),
@@ -60,11 +40,4 @@ export const SignUpBodySchema = z.object({
 export const loginBodyValidation = z.object({
   email: z.string().email(),
   password: z.string(),
-});
-
-export const companyBodyValidation = z.object({
-  name: z.string(),
-  address: z.string(),
-  country: z.string(),
-  pinCode: z.string(),
 });

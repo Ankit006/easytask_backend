@@ -1,12 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { SignUpBodySchema, loginBodyValidation } from "../../validation";
-import { IUser } from "../../database/database.schema";
+import { UserType } from "../../database/database.schema";
 import argon2 from "argon2";
-import {
-  HttpStatus,
-  mongoErrorFormatter,
-  zodErrorFormatter,
-} from "../../utils";
 
 export function authRoutes(fastifyInstance: FastifyInstance) {
   // Signin user
@@ -15,7 +10,7 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
     if (validUserData.success) {
       // get the user from database
       const user =
-        await fastifyInstance.DBClient.userCollection().findOne<IUser>({
+        await fastifyInstance.DBClient.userCollection().findOne<UserType>({
           email: validUserData.data.email,
         });
       // Check if user exist
@@ -27,23 +22,27 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
         );
 
         if (validatePass) {
+          // generate a new jwt token
+          const token = fastifyInstance.jwt.sign({ userId: user._id });
+
+          // set Cookie and send response
           reply
-            .status(HttpStatus.SUCCESS)
-            .send({ mesasge: "Login successful", user });
+            .setCookie("auth", token, {
+              httpOnly: true,
+              maxAge: 60 * 60,
+              secure: true,
+            })
+
+            .status(201)
+            .send({ mesasge: "Login successful" });
         } else {
-          return reply
-            .status(HttpStatus.NOT_FOUND)
-            .send({ error: "Please provide correct email or password" });
+          return reply.notFound("Please provide correct email or password");
         }
       } else {
-        return reply
-          .status(HttpStatus.NOT_FOUND)
-          .send({ error: "Please provide correct email or password" });
+        return reply.notFound("Please provide correct email or password");
       }
     } else {
-      return reply
-        .status(HttpStatus.UNPROCESSABLE_ENTITY)
-        .send(zodErrorFormatter(validUserData.error.errors));
+      return validUserData.error;
     }
   });
 
@@ -52,37 +51,37 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
   fastifyInstance.post("/signup", async function (request, reply) {
     // validate user body
     const validUserData = SignUpBodySchema.safeParse(request.body);
+
     if (validUserData.success) {
       try {
-        // check if user with this email already exist (because email must be unique)
-        const user = await this.DBClient.userCollection().findOne({
-          email: validUserData.data.email,
-        });
-        if (user) {
-          return reply
-            .status(HttpStatus.CONFLICT)
-            .send({ error: "A user with this email already exist" });
-        }
         // Generate user object (this method also handle password hashing adding it to the new user object)
         const userData = await this.DBClient.generateUserObject(
           validUserData.data
         );
 
         // inserting new user object to user coolection
-        await fastifyInstance.DBClient.userCollection().insertOne(userData);
-        delete userData.password;
+        const res = await fastifyInstance.DBClient.userCollection().insertOne(
+          userData
+        );
+
+        // generate jwt token and the payload is user objectId
+        const token = fastifyInstance.jwt.sign({ userId: res.insertedId });
+
+        // set JWT to the HTTPOnly cookie and send response
         reply
-          .status(HttpStatus.CREATED)
-          .send({ mesasge: "Account created successfuly", user: userData });
-      } catch (err: any) {
-        return reply
-          .status(HttpStatus.BAD_GATEWAY)
-          .send(mongoErrorFormatter(err));
+          .setCookie("auth", token, {
+            httpOnly: true,
+            maxAge: 60 * 60,
+            secure: true,
+          })
+
+          .status(201)
+          .send({ mesasge: "Account created successfuly" });
+      } catch (err) {
+        return reply.send("There are some issue with database");
       }
     } else {
-      return reply
-        .status(HttpStatus.UNPROCESSABLE_ENTITY)
-        .send(zodErrorFormatter(validUserData.error.errors));
+      return validUserData.error;
     }
   });
 }
