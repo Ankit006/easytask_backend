@@ -1,13 +1,16 @@
 import { FastifyInstance } from "fastify";
 import argon2 from "argon2";
 import { singUpBodyType } from "../types";
-import { UserType } from "./database.schema";
+import { IUser } from "./database.schema";
 
 export default class DBClient {
   private fastifyInstance: FastifyInstance;
 
-  private routes = {
-    user: "user",
+  private collection = {
+    users: "users",
+    company: "company",
+    notification: "notification",
+    members: "members",
   };
 
   constructor(fastifyInstance: FastifyInstance) {
@@ -17,27 +20,35 @@ export default class DBClient {
   /**
    * @returns mongoDB client
    */
-  getClient() {
+  private getClient() {
     return this.fastifyInstance.mongo.client.db(
       this.fastifyInstance.envConfig.DB
     );
   }
 
-  /**
-   *
-   * @returns user collection
-   */
   userCollection() {
-    return this.getClient().collection(this.routes.user);
+    return this.getClient().collection(this.collection.users);
   }
 
   async generateUserObject(userData: singUpBodyType) {
     const hashedPassword = await argon2.hash(userData.password);
-    const userObject: Partial<UserType> = {
+    const userObject: Partial<IUser> = {
       ...userData,
       password: hashedPassword,
       isActive: true,
     };
     return userObject;
+  }
+
+  companyCollection() {
+    return this.getClient().collection(this.collection.company);
+  }
+
+  membersCollection() {
+    return this.getClient().collection(this.collection.members);
+  }
+
+  notificationCollection() {
+    return this.getClient().collection(this.collection.notification);
   }
 }
