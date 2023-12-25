@@ -1,9 +1,9 @@
 import { FastifyInstance, DoneFuncWithErrOrRes } from "fastify";
-import { CompanyPluginOptionType } from "../../../types";
 import companyAdminRoute from "./company_admin.route";
-import { ICompany } from "../../../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
-import { HttpStatus } from "../../../utils";
+import { ICompany } from "../../../../../../database/database.schema";
+import { CompanyPluginOptionType } from "../../../../../../types";
+import { HttpStatus } from "../../../../../../utils";
 
 export default function companyPlugin(
   fastifyInstance: FastifyInstance,
