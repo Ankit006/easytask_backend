@@ -1,7 +1,8 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
 import { CompanyMemberPluginOptionType } from "./validation";
-import { IMember } from "../../../database/database.schema";
-import { HttpStatus } from "../../../utils";
+import { IMember } from "../../../../database/database.schema";
+import { HttpStatus } from "../../../../utils";
+import { companyMemberRoute } from "./company_member.route";
 
 export default function companyMemebersPlugin(
   fastifyInstance: FastifyInstance,
@@ -10,6 +11,7 @@ export default function companyMemebersPlugin(
 ) {
   fastifyInstance.decorateRequest("companyId", "");
   fastifyInstance.decorateRequest("memberRole", "Member");
+
   fastifyInstance.addHook("preHandler", async function (request, reply) {
     const { companyId } = request.params as { companyId: string };
     const member = await this.DBClient.membersCollection().findOne<IMember>({
@@ -24,5 +26,6 @@ export default function companyMemebersPlugin(
     request.companyId = companyId;
     request.memberRole = member.role;
   });
+  companyMemberRoute(fastifyInstance);
   done();
 }

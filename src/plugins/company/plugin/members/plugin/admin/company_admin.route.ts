@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { HttpStatus, zodErrorFormatter } from "../../../utils";
+
 import { ObjectId } from "@fastify/mongodb";
-import { ICompany, NotificationType } from "../../../database/database.schema";
+import { HttpStatus } from "../../../../../../utils";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (req, reply) {
