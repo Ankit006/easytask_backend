@@ -68,9 +68,3 @@ export const companyBodyValidation = z.object({
   country: z.string(),
   pinCode: z.string(),
 });
-
-export const companyMemberAssignBodyvalidation = z.object({
-  memberId: z.string().refine((value) => ObjectId.isValid(value), {
-    message: "memberId is not a valid Id",
-  }),
-});

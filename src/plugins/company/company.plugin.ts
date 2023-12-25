@@ -7,7 +7,8 @@ export default function companyPlugin(
   done: DoneFuncWithErrOrRes
 ) {
   companyRoutes(fastifyInstance);
-  fastifyInstance.register(require("./admin/company_admin.plugin"), {
+
+  fastifyInstance.register(require("./members/company_members.plugin"), {
     prefix: "/:companyId",
   });
   done();

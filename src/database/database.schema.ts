@@ -14,9 +14,15 @@ export interface ImageStore {
 
 export interface ICompany extends z.infer<typeof companyBodyValidation> {
   _id: ObjectId;
-  adminId: string;
-  members: string[];
   logo: ImageStore | null;
+}
+
+export interface IMember {
+  _id: ObjectId;
+  userId: string;
+  companyId: string;
+  role: "Admin" | "Member";
+  designation: string[];
 }
 
 export interface NotificationType {

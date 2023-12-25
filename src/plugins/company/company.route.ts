@@ -1,12 +1,8 @@
 import { FastifyInstance } from "fastify";
-import { companyBodyValidation } from "../../validation";
-import {
-  HttpStatus,
-  mongoErrorFormatter,
-  zodErrorFormatter,
-} from "../../utils";
-import { ICompany, ImageStore } from "../../database/database.schema";
+import { HttpStatus, mongoErrorFormatter } from "../../utils";
+import { ICompany, IMember, ImageStore } from "../../database/database.schema";
 import { CompanyFileFormValidation } from "./validation";
+import { ObjectId } from "@fastify/mongodb";
 export function companyRoutes(fastifyInstance: FastifyInstance) {
   /////////////////////// fastify multipart /////////////////////////////
   fastifyInstance.register(require("@fastify/multipart"), {
@@ -19,12 +15,18 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
 
   fastifyInstance.get("/", async function (request, reply) {
     try {
-      const companyList = await this.DBClient.companyCollection()
-        .find<ICompany>({
-          adminId: request.userId,
-        })
-        .toArray();
-      return reply.send(companyList);
+      const memberList = this.DBClient.membersCollection().find<IMember>({
+        userId: request.userId,
+      });
+      const companyList: ICompany[] = [];
+      for await (const member of memberList) {
+        const company =
+          await this.DBClient.companyCollection().findOne<ICompany>({
+            _id: new ObjectId(member.companyId),
+          });
+        company && companyList.push(company);
+      }
+      return reply.status(HttpStatus.SUCCESS).send(companyList);
     } catch (err) {
       return reply
         .status(HttpStatus.BAD_GATEWAY)
@@ -66,14 +68,21 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
         // save company data and send response
         const companyData: Partial<ICompany> = {
           name: validatedBody.data.name.value.toLowerCase(),
-          adminId: req.userId,
           logo,
           pinCode: validatedBody.data.pinCode.value,
-          members: [],
           country: validatedBody.data.country.value,
           address: validatedBody.data.address.value,
         };
+
         await this.DBClient.companyCollection().insertOne(companyData);
+        // create memberData
+        const memberData: Partial<IMember> = {
+          companyId: companyData._id?.toString(),
+          designation: [],
+          role: "Admin",
+          userId: req.userId,
+        };
+        await this.DBClient.membersCollection().insertOne(memberData);
         reply.status(HttpStatus.CREATED).send(companyData);
       } catch (err) {
         return reply

@@ -43,6 +43,7 @@ declare module "fastify" {
     userId: string;
     // companyId is avilable under company_admin.plugin.ts
     companyId: string;
+    memberRole: "Admin" | "Member";
   }
 
   interface RouteShorthandOptions {
