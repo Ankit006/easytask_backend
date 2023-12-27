@@ -10,6 +10,14 @@ export default function authPlugin(
   _opts: AuthPluginOptionType,
   done: DoneFuncWithErrOrRes
 ) {
+  /////////////////////// fastify multipart /////////////////////////////
+  fastifyInstance.register(require("@fastify/multipart"), {
+    limits: {
+      fileSize: 3000000,
+      fields: 10,
+    },
+    attachFieldsToBody: true,
+  });
   // auth route
   authRoutes(fastifyInstance);
 

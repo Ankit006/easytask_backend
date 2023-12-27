@@ -4,15 +4,6 @@ import { ICompany, IMember, ImageStore } from "../../database/database.schema";
 import { CompanyFileFormValidation } from "./validation";
 import { ObjectId } from "@fastify/mongodb";
 export function companyRoutes(fastifyInstance: FastifyInstance) {
-  /////////////////////// fastify multipart /////////////////////////////
-  fastifyInstance.register(require("@fastify/multipart"), {
-    limits: {
-      fileSize: 3000000,
-      fields: 10,
-    },
-    attachFieldsToBody: true,
-  });
-
   fastifyInstance.get("/", async function (request, reply) {
     try {
       const memberList = this.DBClient.membersCollection().find<IMember>({
@@ -57,7 +48,8 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
           const buffer = await validatedBody.data.file.toBuffer();
           const res = await this.imageStorage.uploadImage(
             buffer,
-            validatedBody.data.file.filename
+            validatedBody.data.file.filename,
+            "companyLogo"
           );
           logo = {
             fileId: res.fileId,

@@ -12,10 +12,10 @@ export class ImageStorage {
     this.imageKit = imageKit;
   }
 
-  uploadImage(file: any, fileName: string) {
+  uploadImage(file: any, fileName: string, folderName: string) {
     return this.imageKit.upload({
       file: file,
-      folder: "companyLogo",
+      folder: folderName,
       fileName: fileName,
     });
   }

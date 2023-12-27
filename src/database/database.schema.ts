@@ -2,9 +2,16 @@ import { z } from "zod";
 import { SignUpBodySchema, companyBodyValidation } from "../validation";
 import { ObjectId } from "@fastify/mongodb";
 
-export interface IUser extends z.infer<typeof SignUpBodySchema> {
+export interface IUser {
   _id: ObjectId;
+  firstName: string;
+  lastName: string;
+  age: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
   isActive: boolean;
+  profilePic: ImageStore | null;
 }
 
 export interface ImageStore {

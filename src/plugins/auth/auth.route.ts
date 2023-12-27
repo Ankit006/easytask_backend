@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { SignUpBodySchema, loginBodyValidation } from "../../validation";
-import { IUser } from "../../database/database.schema";
+import { IUser, ImageStore } from "../../database/database.schema";
 import argon2 from "argon2";
 import {
   HttpStatus,
@@ -56,17 +56,42 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
       try {
         // check if user with this email already exist (because email must be unique)
         const user = await this.DBClient.userCollection().findOne({
-          email: validUserData.data.email,
+          email: validUserData.data.email.value,
         });
         if (user) {
           return reply
             .status(HttpStatus.CONFLICT)
             .send({ error: "A user with this email already exist" });
         }
-        // Generate user object (this method also handle password hashing adding it to the new user object)
-        const userData = await this.DBClient.generateUserObject(
-          validUserData.data
+
+        let logo: ImageStore | null = null;
+
+        if (validUserData.data.file) {
+          const buffer = await validUserData.data.file.toBuffer();
+          const res = await this.imageStorage.uploadImage(
+            buffer,
+            validUserData.data.file.filename,
+            "userProfilePic"
+          );
+          logo = {
+            fileId: res.fileId,
+            url: res.url,
+          };
+        }
+        const hashedPassword = await argon2.hash(
+          validUserData.data.password.value
         );
+
+        const userData: Partial<IUser> = {
+          firstName: validUserData.data.firstName.value,
+          lastName: validUserData.data.lastName.value,
+          age: validUserData.data.age.value,
+          email: validUserData.data.email.value,
+          password: hashedPassword,
+          phoneNumber: validUserData.data.phoneNumber.value,
+          isActive: true,
+          profilePic: logo,
+        };
 
         // inserting new user object to user coolection
         await fastifyInstance.DBClient.userCollection().insertOne(userData);

@@ -6,6 +6,15 @@ export default function companyPlugin(
   _opts: CompanyPluginOptionType,
   done: DoneFuncWithErrOrRes
 ) {
+  /////////////////////// fastify multipart /////////////////////////////
+  fastifyInstance.register(require("@fastify/multipart"), {
+    limits: {
+      fileSize: 3000000,
+      fields: 10,
+    },
+    attachFieldsToBody: true,
+  });
+
   companyRoutes(fastifyInstance);
 
   fastifyInstance.register(require("./plugin/members/company_members.plugin"), {

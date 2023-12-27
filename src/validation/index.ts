@@ -43,18 +43,21 @@ export const environmentSchema = {
 export interface BaseOptionTypes {
   prefix: string;
 }
+const FileFormField = z.object({
+  type: z.string(),
+  fieldname: z.string(),
+  mimetype: z.string(),
+  value: z.string(),
+});
 
 export const SignUpBodySchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  age: z.string(),
-  email: z.string().email(),
-  phoneNumber: z
-    .string()
-    .refine((value) => value.length >= 10 && value.length <= 12, {
-      message: "Phone number length must be between 10 and 12 characters",
-    }),
-  password: z.string().min(8),
+  firstName: FileFormField,
+  lastName: FileFormField,
+  age: FileFormField,
+  email: FileFormField,
+  phoneNumber: FileFormField,
+  password: FileFormField,
+  file: z.any(),
 });
 
 export const loginBodyValidation = z.object({
