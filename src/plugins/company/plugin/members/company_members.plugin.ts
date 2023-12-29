@@ -27,5 +27,6 @@ export default function companyMemebersPlugin(
     request.memberRole = member.role;
   });
   companyMemberRoute(fastifyInstance);
+  fastifyInstance.register(require("./plugin/admin/company_admin.plugin"));
   done();
 }
