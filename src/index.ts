@@ -1,14 +1,11 @@
-import Fastify from "fastify";
-import registeredPlugIn from "./main.plugin";
-import {
-  FastifyMongoNestedObject,
-  FastifyMongoObject,
-  ObjectId,
-} from "@fastify/mongodb";
-import DBClient from "./database/dbClient";
 import { JWT } from "@fastify/jwt";
-import { Socket } from "socket.io";
-import { IUser } from "./database/database.schema";
+import { FastifyMongoNestedObject, FastifyMongoObject } from "@fastify/mongodb";
+import Fastify from "fastify";
+import { Server } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import DBClient from "./database/dbClient";
+import registeredPlugIn from "./main.plugin";
+import WebSocket from "./plugins/decorators/WebSocket";
 import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
 
 const fastify = Fastify({ logger: true });
@@ -33,8 +30,9 @@ declare module "fastify" {
     jwt: JWT;
 
     userID: string;
-    io: Socket;
+    io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
     imageStorage: ImageStorage;
+    webSocket: WebSocket;
   }
 
   interface FastifyRequest {

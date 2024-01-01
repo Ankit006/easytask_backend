@@ -5,9 +5,11 @@ import DBClient from "./database/dbClient";
 import { FastifyCookieOptions } from "@fastify/cookie";
 import { FastifyJWTOptions } from "@fastify/jwt";
 import { FastifyMongodbOptions } from "@fastify/mongodb";
-import { Socket } from "socket.io";
+import { ServerOptions } from "socket.io";
 import { FastifyCorsOptions } from "@fastify/cors";
 import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
+import WebSocket from "./plugins/decorators/WebSocket";
+import socketIo from "./plugins/decorators/SocketIo";
 //  This function holds all global register plugin and decorators
 export default async function registeredPlugIn(
   fastifyInstance: FastifyInstance
@@ -57,8 +59,13 @@ export default async function registeredPlugIn(
   await fastifyInstance.after();
 
   /////////////////////////////// socket io plugin ///////////////////////////////////////////////////////////////////////////
-  fastifyInstance.register(require("fastify-socket.io"));
-  await fastifyInstance.after();
+  // fastifyInstance.register(require("fastify-socket.io"), {
+  //   cors: {
+  //     origin: fastifyInstance.envConfig.FRONTEND_URL,
+  //     credentials: true,
+  //   },
+  // } as ServerOptions);
+  // await fastifyInstance.after();
 
   /////////////////////////////// authentation plugin /////////////////////////////////////////////////////////////////////////////
   fastifyInstance.register(require("./plugins/auth/auth.plugin"), {
@@ -69,16 +76,6 @@ export default async function registeredPlugIn(
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
 
   fastifyInstance.decorate("imageStorage", new ImageStorage(fastifyInstance));
-
-  // listening to socket connection
-  fastifyInstance.io.on("connection", (socket: Socket) => {
-    console.log(socket.id);
-    socket.emit("data", "hey");
-    socket.on("chat", (arg1, arg2, callback) => {
-      console.log("hey", arg1, arg2);
-    });
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
-    });
-  });
+  fastifyInstance.decorate("io", socketIo(fastifyInstance));
+  fastifyInstance.decorate("webSocket", new WebSocket(fastifyInstance));
 }
