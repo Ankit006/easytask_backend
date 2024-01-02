@@ -37,6 +37,18 @@ export default function privateGuardPlugin(
     }
   });
 
+  fastifyInstance.get("/user", async function (request, reply) {
+    const user = await this.DBClient.userCollection().findOne<IUser>(
+      {
+        _id: new ObjectId(request.userId),
+      },
+      { projection: { password: 0 } }
+    );
+    return user
+      ? reply.status(HttpStatus.SUCCESS).send(user)
+      : reply.status(HttpStatus.NOT_FOUND).send({ error: "user not found" });
+  });
+
   // company plugin
   fastifyInstance.register(require("../company/company.plugin"), {
     prefix: "/company",

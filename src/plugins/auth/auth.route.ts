@@ -92,7 +92,6 @@ export function authRoutes(fastifyInstance: FastifyInstance) {
           isActive: true,
           profilePic: logo,
         };
-
         // inserting new user object to user coolection
         await fastifyInstance.DBClient.userCollection().insertOne(userData);
         delete userData.password;

@@ -10,10 +10,11 @@ const validatedAuth = z.object({
 });
 
 export default class WebSocket {
-  webSocket: Socket;
+  private fastify: FastifyInstance;
 
   constructor(fastify: FastifyInstance) {
-    this.webSocket = undefined as any;
+    this.fastify = fastify;
+    let userId = "";
     // check if socket has valid userId
     fastify.io.use((socket, next) => {
       const newSocket = socket as any;
@@ -21,14 +22,23 @@ export default class WebSocket {
       if (!validData.success) {
         return next(new Error("Thou shall not pass"));
       }
+      userId = validData.data.userId;
       next();
     });
 
+    // list to connection
     fastify.io.on("connection", (socket: Socket) => {
-      this.webSocket = socket;
+      // join user to a room.
+      // this is a personal room where backend emit different event such as notification
+      socket.join(userId);
       socket.on("disconnect", () => {
         console.log("user disconnected");
       });
     });
+  }
+  emitEvent(type: "notification", roomId: string, payload: any) {
+    if (type === "notification") {
+      this.fastify.io.to(roomId).emit("notification", payload);
+    }
   }
 }

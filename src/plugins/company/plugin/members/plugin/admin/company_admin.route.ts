@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { searchUserValidation } from "./validation";
+import { searchUserValidation, userRequestQueryValidation } from "./validation";
 import { HttpStatus, zodErrorFormatter } from "../../../../../../utils";
 import { IMember, IUser } from "../../../../../../database/database.schema";
 
@@ -37,4 +37,22 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       }
     }
   );
+
+  fastifyInstance.get("/users/request", async function (request, reply) {
+    const validData = userRequestQueryValidation.safeParse(request.query);
+    if (validData.success) {
+      this.webSocket.emitEvent(
+        "notification",
+        validData.data.userId,
+        "You are requested to join this group"
+      );
+      reply
+        .status(HttpStatus.SUCCESS)
+        .send({ message: "Join request is sent" });
+    } else {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(zodErrorFormatter(validData.error.errors));
+    }
+  });
 }
