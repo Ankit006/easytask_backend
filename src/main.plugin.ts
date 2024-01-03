@@ -1,15 +1,16 @@
-import { FastifyInstance } from "fastify";
-import fastifyEnv from "@fastify/env";
-import { environmentSchema } from "./validation";
-import DBClient from "./database/dbClient";
 import { FastifyCookieOptions } from "@fastify/cookie";
+import { FastifyCorsOptions } from "@fastify/cors";
+import fastifyEnv from "@fastify/env";
 import { FastifyJWTOptions } from "@fastify/jwt";
 import { FastifyMongodbOptions } from "@fastify/mongodb";
-import { ServerOptions } from "socket.io";
-import { FastifyCorsOptions } from "@fastify/cors";
-import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
-import WebSocket from "./plugins/decorators/WebSocket";
+import { FastifyInstance } from "fastify";
+import DBClient from "./database/dbClient";
 import socketIo from "./plugins/decorators/SocketIo";
+import WebSocket from "./plugins/decorators/WebSocket";
+import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
+import { environmentSchema } from "./validation";
+import redis from "./plugins/redis/redis";
+import RedisCache from "./plugins/decorators/RedisCache";
 //  This function holds all global register plugin and decorators
 export default async function registeredPlugIn(
   fastifyInstance: FastifyInstance
@@ -76,6 +77,13 @@ export default async function registeredPlugIn(
   fastifyInstance.register(require("./plugins/guard/private.plugin"));
 
   fastifyInstance.decorate("imageStorage", new ImageStorage(fastifyInstance));
+
+  // connect to websocket
   fastifyInstance.decorate("io", socketIo(fastifyInstance));
   fastifyInstance.decorate("webSocket", new WebSocket(fastifyInstance));
+
+  // connect to redis
+  fastifyInstance.register(redis);
+  await fastifyInstance.after();
+  fastifyInstance.decorate("redisCache", new RedisCache(fastifyInstance));
 }

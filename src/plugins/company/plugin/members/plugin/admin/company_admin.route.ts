@@ -1,7 +1,13 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { searchUserValidation, userRequestQueryValidation } from "./validation";
 import { HttpStatus, zodErrorFormatter } from "../../../../../../utils";
-import { IMember, IUser } from "../../../../../../database/database.schema";
+import {
+  ICompany,
+  IJoinRequestNotification,
+  IMember,
+  IUser,
+} from "../../../../../../database/database.schema";
+import { ObjectId } from "@fastify/mongodb";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get(
@@ -41,14 +47,37 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/users/request", async function (request, reply) {
     const validData = userRequestQueryValidation.safeParse(request.query);
     if (validData.success) {
-      this.webSocket.emitEvent(
-        "notification",
-        validData.data.userId,
-        "You are requested to join this group"
-      );
-      reply
-        .status(HttpStatus.SUCCESS)
-        .send({ message: "Join request is sent" });
+      const companyData =
+        await this.DBClient.companyCollection().findOne<ICompany>({
+          _id: new ObjectId(request.companyId),
+        });
+      if (companyData) {
+        const date = new Date();
+        const joinRequest: IJoinRequestNotification = {
+          type: "JOIN_REQUEST",
+          companyDetail: {
+            companyLogo: companyData.logo,
+            companyName: companyData.name,
+          },
+          buttonAction: {
+            accept: "",
+            cancel: "",
+          },
+          timestamp: date.toISOString(),
+        };
+        this.webSocket.emitEvent(
+          "notification",
+          validData.data.userId,
+          joinRequest
+        );
+        reply
+          .status(HttpStatus.SUCCESS)
+          .send({ message: "Join request is sent" });
+      } else {
+        reply
+          .status(HttpStatus.NOT_FOUND)
+          .send({ error: "No company details found" });
+      }
     } else {
       return reply
         .status(HttpStatus.BAD_REQUEST)

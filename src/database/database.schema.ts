@@ -32,18 +32,15 @@ export interface IMember {
   designation: string[];
 }
 
-export interface NotificationType {
-  type: "CONFIRMATION" | "MESSAGE";
-  message: string;
-
-  // links attribute is for CONFIRMATION notification, for MESSAGE it will be null
-  links: {
+export interface IJoinRequestNotification {
+  type: "JOIN_REQUEST";
+  companyDetail: {
+    companyLogo: null | ImageStore;
+    companyName: string;
+  };
+  buttonAction: {
     accept: string;
-    decline: string;
-  } | null;
-
-  // isViewed indicate that if the current notification is viewed by the user. By default the value is false
-  isViewed: boolean;
-  userId: ObjectId;
-  companyId: ObjectId;
+    cancel: string;
+  };
+  timestamp: string;
 }

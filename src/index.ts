@@ -7,6 +7,8 @@ import DBClient from "./database/dbClient";
 import registeredPlugIn from "./main.plugin";
 import WebSocket from "./plugins/decorators/WebSocket";
 import { ImageStorage } from "./plugins/decorators/imageStorage/imageStorage";
+import { RedisClientType } from "redis";
+import RedisCache from "./plugins/decorators/RedisCache";
 
 const fastify = Fastify({ logger: true });
 
@@ -33,6 +35,8 @@ declare module "fastify" {
     io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
     imageStorage: ImageStorage;
     webSocket: WebSocket;
+    redis: RedisClientType;
+    redisCache: RedisCache;
   }
 
   interface FastifyRequest {

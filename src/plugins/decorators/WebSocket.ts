@@ -2,6 +2,7 @@ import { ObjectId } from "@fastify/mongodb";
 import { FastifyInstance } from "fastify";
 import { Socket } from "socket.io";
 import { z } from "zod";
+import { IJoinRequestNotification } from "../../database/database.schema";
 
 const validatedAuth = z.object({
   userId: z.string().refine((value) => ObjectId.isValid(value), {
@@ -36,7 +37,11 @@ export default class WebSocket {
       });
     });
   }
-  emitEvent(type: "notification", roomId: string, payload: any) {
+  emitEvent(
+    type: "notification",
+    roomId: string,
+    payload: IJoinRequestNotification
+  ) {
     if (type === "notification") {
       this.fastify.io.to(roomId).emit("notification", payload);
     }
