@@ -22,6 +22,7 @@
     "@fastify/sensible": "^5.5.0",
     "@fastify/websocket": "^8.2.0",
     "@types/node": "^20.9.2",
+    "@types/uuid": "^9.0.7",
     "argon2": "^0.31.2",
     "fastify": "^4.24.3",
     "fastify-plugin": "^4.5.1",
@@ -33,6 +34,7 @@
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
+    "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

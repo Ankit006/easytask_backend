@@ -33,6 +33,7 @@ export interface IMember {
 }
 
 export interface IJoinRequestNotification {
+  _id: string;
   type: "JOIN_REQUEST";
   companyDetail: {
     companyLogo: null | ImageStore;

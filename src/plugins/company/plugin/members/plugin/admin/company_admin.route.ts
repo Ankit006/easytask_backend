@@ -8,6 +8,7 @@ import {
   IUser,
 } from "../../../../../../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
+import { v4 as uuidv4 } from "uuid";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get(
@@ -54,6 +55,7 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       if (companyData) {
         const date = new Date();
         const joinRequest: IJoinRequestNotification = {
+          _id: uuidv4(),
           type: "JOIN_REQUEST",
           companyDetail: {
             companyLogo: companyData.logo,

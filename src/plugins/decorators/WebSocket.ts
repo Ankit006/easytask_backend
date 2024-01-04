@@ -39,11 +39,12 @@ export default class WebSocket {
   }
   emitEvent(
     type: "notification",
-    roomId: string,
+    userId: string,
     payload: IJoinRequestNotification
   ) {
     if (type === "notification") {
-      this.fastify.io.to(roomId).emit("notification", payload);
+      this.fastify.io.to(userId).emit("notification", payload);
+      this.fastify.redisCache.storeNotification(userId, payload);
     }
   }
 }
