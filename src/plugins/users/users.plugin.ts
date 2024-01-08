@@ -1,8 +1,13 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
 import { BaseOptionTypes } from "../../validation";
 import { ObjectId } from "@fastify/mongodb";
-import { IUser } from "../../database/database.schema";
-import { HttpStatus } from "../../utils";
+import { IMember, IUser } from "../../database/database.schema";
+import {
+  HttpStatus,
+  mongoErrorFormatter,
+  zodErrorFormatter,
+} from "../../utils";
+import { validateCompanyJoinData } from "./types";
 
 export default function usersPlugin(
   fastify: FastifyInstance,
@@ -30,5 +35,31 @@ export default function usersPlugin(
     }
   });
 
+  fastify.post("/join-company", async function (request, reply) {
+    const validatedData = validateCompanyJoinData.safeParse(request.body);
+    if (validatedData.success) {
+      const memberObj: IMember = {
+        _id: new ObjectId(),
+        userId: request.userId,
+        companyId: validatedData.data.companyId,
+        role: "Member",
+        designation: [],
+      };
+      try {
+        await this.DBClient.membersCollection().insertOne(memberObj);
+        return reply
+          .status(HttpStatus.SUCCESS)
+          .send({ message: "You are now member to this company" });
+      } catch (err) {
+        return reply
+          .status(HttpStatus.BAD_GATEWAY)
+          .send(mongoErrorFormatter(err));
+      }
+    } else {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(zodErrorFormatter(validatedData.error.errors));
+    }
+  });
   done();
 }

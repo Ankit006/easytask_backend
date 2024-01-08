@@ -36,4 +36,16 @@ export default class RedisCache {
       return { error: "Unable to get notifications" };
     }
   }
+
+  async removeNotification(userId: string, notificationId: string) {
+    try {
+      const res = await this.fastify.redis.hDel(
+        `${userId}:notification`,
+        notificationId
+      );
+      return res > 0;
+    } catch (er) {
+      return { error: "Unable to get notifications" };
+    }
+  }
 }
