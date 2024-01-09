@@ -50,6 +50,10 @@ export default function usersPlugin(
       };
       try {
         await this.DBClient.membersCollection().insertOne(memberObj);
+        await this.redisCache.removeNotification(
+          request.userId,
+          validatedData.data.notificationId
+        );
         return reply
           .status(HttpStatus.SUCCESS)
           .send({ message: "You are now member to this company" });
