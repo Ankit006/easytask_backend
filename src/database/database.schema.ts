@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { SignUpBodySchema, companyBodyValidation } from "../validation";
 import { ObjectId } from "@fastify/mongodb";
+import { z } from "zod";
+import { companyBodyValidation } from "../validation";
 
 export interface IUser {
   _id: ObjectId;
@@ -36,12 +36,9 @@ export interface IJoinRequestNotification {
   _id: string;
   type: "JOIN_REQUEST";
   companyDetail: {
+    companyId: string;
     companyLogo: null | ImageStore;
     companyName: string;
-  };
-  buttonAction: {
-    accept: string;
-    cancel: string;
   };
   timestamp: string;
 }

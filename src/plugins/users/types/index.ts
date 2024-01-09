@@ -7,3 +7,7 @@ export const validateCompanyJoinData = z.object({
   }),
   notificationId: z.string(),
 });
+
+export const validateDeleteNotifcationQuery = z.object({
+  notificationId: z.string(),
+});

@@ -58,12 +58,9 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
           _id: uuidv4(),
           type: "JOIN_REQUEST",
           companyDetail: {
+            companyId: request.companyId,
             companyLogo: companyData.logo,
             companyName: companyData.name,
-          },
-          buttonAction: {
-            accept: "",
-            cancel: "",
           },
           timestamp: date.toISOString(),
         };

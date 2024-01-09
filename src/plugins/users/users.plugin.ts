@@ -7,7 +7,10 @@ import {
   mongoErrorFormatter,
   zodErrorFormatter,
 } from "../../utils";
-import { validateCompanyJoinData } from "./types";
+import {
+  validateCompanyJoinData,
+  validateDeleteNotifcationQuery,
+} from "./types";
 
 export default function usersPlugin(
   fastify: FastifyInstance,
@@ -52,13 +55,36 @@ export default function usersPlugin(
           .send({ message: "You are now member to this company" });
       } catch (err) {
         return reply
-          .status(HttpStatus.BAD_GATEWAY)
+          .status(HttpStatus.SERVER_ERROR)
           .send(mongoErrorFormatter(err));
       }
     } else {
       return reply
         .status(HttpStatus.BAD_REQUEST)
         .send(zodErrorFormatter(validatedData.error.errors));
+    }
+  });
+
+  fastify.delete("/remove-notifcation", async function (request, reply) {
+    const validateData = validateDeleteNotifcationQuery.safeParse(
+      request.query
+    );
+    if (validateData.success) {
+      const res = await this.redisCache.removeNotification(
+        request.userId,
+        validateData.data.notificationId
+      );
+      if (typeof res === "boolean") {
+        return reply
+          .status(HttpStatus.SUCCESS)
+          .send({ message: "Notification is removed" });
+      } else {
+        return reply.status(HttpStatus.SERVER_ERROR).send(res);
+      }
+    } else {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(zodErrorFormatter(validateData.error.errors));
     }
   });
   done();
