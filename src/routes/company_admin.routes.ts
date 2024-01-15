@@ -1,14 +1,18 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { searchUserValidation, userRequestQueryValidation } from "./validation";
-import { HttpStatus, zodErrorFormatter } from "../../../../../../utils";
-import {
-  ICompany,
-  IJoinRequestNotification,
-  IMember,
-  IUser,
-} from "../../../../../../database/database.schema";
+
 import { ObjectId } from "@fastify/mongodb";
 import { v4 as uuidv4 } from "uuid";
+import {
+  IUser,
+  IMember,
+  ICompany,
+  IJoinRequestNotification,
+} from "../database/database.schema";
+import { HttpStatus, zodErrorFormatter } from "../utils";
+import {
+  searchUserValidation,
+  userRequestQueryValidation,
+} from "../validation/company_admin.validation";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
   fastifyInstance.get(
@@ -20,9 +24,12 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       const params = request.query;
       const validationResult = searchUserValidation.safeParse(params);
       if (validationResult.success) {
-        const user = await this.DBClient.userCollection().findOne<IUser>({
-          email: validationResult.data.email,
-        });
+        const user = await this.DBClient.userCollection().findOne<IUser>(
+          {
+            email: validationResult.data.email,
+          },
+          { projection: { password: 0 } }
+        );
         if (user) {
           const member =
             await this.DBClient.membersCollection().findOne<IMember>({
@@ -81,6 +88,30 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       return reply
         .status(HttpStatus.BAD_REQUEST)
         .send(zodErrorFormatter(validData.error.errors));
+    }
+  });
+
+  fastifyInstance.get("/members", async function (request, reply) {
+    try {
+      const memberList = this.DBClient.membersCollection().find<IMember>(
+        {
+          companyId: request.companyId,
+          userId: { $ne: request.userId },
+        },
+        { projection: { password: 0 } }
+      );
+      const profileList: IUser[] = [];
+      for await (const member of memberList) {
+        const user = await this.DBClient.userCollection().findOne<IUser>({
+          _id: new ObjectId(member.userId),
+        });
+        user && profileList.push(user);
+      }
+      return reply.status(HttpStatus.SUCCESS).send(profileList);
+    } catch (err) {
+      return reply
+        .status(HttpStatus.SERVER_ERROR)
+        .send({ error: "Oops, its looks like there are server issues😟" });
     }
   });
 }

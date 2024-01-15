@@ -1,6 +1,7 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
 import { CompanyPluginOptionType } from "../../types";
-import { companyRoutes } from "./company.route";
+import { companyRoutes } from "../../routes/company.routes";
+
 export default function companyPlugin(
   fastifyInstance: FastifyInstance,
   _opts: CompanyPluginOptionType,
@@ -17,7 +18,7 @@ export default function companyPlugin(
 
   companyRoutes(fastifyInstance);
 
-  fastifyInstance.register(require("./plugin/members/company_members.plugin"), {
+  fastifyInstance.register(require("./members/company_members.plugin"), {
     prefix: "/:companyId",
   });
   done();

@@ -1,7 +1,7 @@
 import { ObjectId } from "@fastify/mongodb";
 import { FastifyInstance } from "fastify";
-import { HttpStatus } from "../../../../utils";
-import { IUser } from "../../../../database/database.schema";
+import { HttpStatus } from "../utils";
+import { IUser } from "../database/database.schema";
 
 export function companyMemberRoute(fastify: FastifyInstance) {
   fastify.get("/header", async function (request, reply) {
