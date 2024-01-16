@@ -46,7 +46,6 @@ export default function usersPlugin(
         userId: request.userId,
         companyId: validatedData.data.companyId,
         role: "Member",
-        designation: [],
       };
       try {
         await this.DBClient.membersCollection().insertOne(memberObj);

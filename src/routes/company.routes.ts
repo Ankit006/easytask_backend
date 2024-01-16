@@ -71,7 +71,6 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
         // create memberData
         const memberData: Partial<IMember> = {
           companyId: companyData._id?.toString(),
-          designation: [],
           role: "Admin",
           userId: req.userId,
         };

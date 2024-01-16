@@ -29,7 +29,6 @@ export interface IMember {
   userId: string;
   companyId: string;
   role: "Admin" | "Member";
-  designation: string[];
 }
 
 export interface IJoinRequestNotification {
@@ -47,5 +46,5 @@ export interface IGroup {
   _id: ObjectId;
   name: string;
   companyId: string;
-  members: string[];
+  members: [];
 }
