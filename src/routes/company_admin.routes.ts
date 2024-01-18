@@ -15,6 +15,7 @@ import {
 } from "../validation/company_admin.validation";
 
 export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
+  // search a user
   fastifyInstance.get(
     "/users",
     async function (
@@ -52,6 +53,7 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
     }
   );
 
+  // user a user a join request to a company
   fastifyInstance.get("/users/request", async function (request, reply) {
     const validData = userRequestQueryValidation.safeParse(request.query);
     if (validData.success) {
@@ -88,30 +90,6 @@ export default function companyAdminRoute(fastifyInstance: FastifyInstance) {
       return reply
         .status(HttpStatus.BAD_REQUEST)
         .send(zodErrorFormatter(validData.error.errors));
-    }
-  });
-
-  fastifyInstance.get("/members", async function (request, reply) {
-    try {
-      const memberList = this.DBClient.membersCollection().find<IMember>(
-        {
-          companyId: request.companyId,
-          userId: { $ne: request.userId },
-        },
-        { projection: { password: 0 } }
-      );
-      const profileList: IUser[] = [];
-      for await (const member of memberList) {
-        const user = await this.DBClient.userCollection().findOne<IUser>({
-          _id: new ObjectId(member.userId),
-        });
-        user && profileList.push(user);
-      }
-      return reply.status(HttpStatus.SUCCESS).send(profileList);
-    } catch (err) {
-      return reply
-        .status(HttpStatus.SERVER_ERROR)
-        .send({ error: "Oops, its looks like there are server issues😟" });
     }
   });
 }

@@ -4,6 +4,9 @@ import { companyMemberRoute } from "../../../routes/company_members.routes";
 import { HttpStatus } from "../../../utils";
 import { BaseOptionTypes } from "../../../validation";
 
+/**
+ *  Routes under this plugin access by any member in the company
+ */
 export default function companyMemebersPlugin(
   fastifyInstance: FastifyInstance,
   _opts: BaseOptionTypes,

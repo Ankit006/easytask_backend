@@ -3,6 +3,10 @@ import { FastifyInstance } from "fastify";
 import { HttpStatus } from "../utils";
 import { IUser } from "../database/database.schema";
 
+/**
+ *  This routes can be accessed by any member in the company
+ */
+
 export function companyMemberRoute(fastify: FastifyInstance) {
   fastify.get("/header", async function (request, reply) {
     const user = await this.DBClient.userCollection().findOne<IUser>(

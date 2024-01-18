@@ -19,5 +19,6 @@ export default function companyAdminPlugin(
   companyAdminRoute(fastifyInstance);
 
   fastifyInstance.register(require("./groups/company_groups.plugin.ts"));
+  fastifyInstance.register(require("./member/company_admin_member.plugin"));
   done();
 }
