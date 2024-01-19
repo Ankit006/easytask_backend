@@ -1,8 +1,12 @@
 import { FastifyInstance } from "fastify";
-import { CreateCompanyGroupPostValidation } from "../validation/company_group.validation";
-import { HttpStatus, mongoErrorFormatter } from "../utils";
+import {
+  CreateCompanyGroupPostValidation,
+  assignMemberToGroupPutValidation,
+} from "../validation/company_group.validation";
+import { HttpStatus, mongoErrorFormatter, zodErrorFormatter } from "../utils";
 import { IGroup } from "../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
+import { request } from "http";
 
 export default function companyGroupRoutes(fastify: FastifyInstance) {
   fastify.post("/group", async function (request, reply) {
@@ -65,6 +69,53 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
       return reply
         .status(HttpStatus.BAD_GATEWAY)
         .send(mongoErrorFormatter(err));
+    }
+  });
+
+  fastify.put("/group/member", async function (request, reply) {
+    const validData = assignMemberToGroupPutValidation.safeParse(request.body);
+
+    if (!validData.success) {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(zodErrorFormatter(validData.error.errors));
+    }
+
+    try {
+      // check if the member is the member of the current company
+      const member = await this.DBClient.membersCollection().findOne({
+        companyId: request.companyId,
+        userId: validData.data.memberId,
+      });
+
+      if (!member) {
+        return reply
+          .send(HttpStatus.NOT_FOUND)
+          .send({ error: "User is not a member of this company" });
+      }
+
+      // now we push the memberId into the members array in group document
+      await this.DBClient.groupCollection().updateOne(
+        { _id: new ObjectId(validData.data.groupId) },
+        { $push: { members: validData.data.memberId } }
+      );
+      return reply
+        .status(HttpStatus.SUCCESS)
+        .send({ message: "Group is assigned to the memeber" });
+    } catch (err) {
+      return reply
+        .status(HttpStatus.BAD_GATEWAY)
+        .send(mongoErrorFormatter(err));
+    }
+  });
+
+  fastify.put("/group/member/remove", async (request, reply) => {
+    const validData = assignMemberToGroupPutValidation.safeParse(request.body);
+
+    if (!validData.success) {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(zodErrorFormatter(validData.error.errors));
     }
   });
 }
