@@ -6,7 +6,6 @@ import {
 import { HttpStatus, mongoErrorFormatter, zodErrorFormatter } from "../utils";
 import { IGroup } from "../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
-import { request } from "http";
 
 export default function companyGroupRoutes(fastify: FastifyInstance) {
   fastify.post("/group", async function (request, reply) {
@@ -109,13 +108,29 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.put("/group/member/remove", async (request, reply) => {
+  fastify.put("/group/member/remove", async function (request, reply) {
     const validData = assignMemberToGroupPutValidation.safeParse(request.body);
 
     if (!validData.success) {
       return reply
         .status(HttpStatus.BAD_REQUEST)
         .send(zodErrorFormatter(validData.error.errors));
+    }
+
+    try {
+      await this.DBClient.groupCollection().updateOne(
+        { _id: new ObjectId(validData.data.groupId) },
+        {
+          $pull: { members: validData.data.memberId },
+        }
+      );
+      return reply
+        .status(HttpStatus.SUCCESS)
+        .send({ message: "Member is removed" });
+    } catch (err) {
+      return reply
+        .status(HttpStatus.BAD_GATEWAY)
+        .send(mongoErrorFormatter(err));
     }
   });
 }
