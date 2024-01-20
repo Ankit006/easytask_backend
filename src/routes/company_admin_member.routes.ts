@@ -59,26 +59,7 @@ export default function companyAdminMemberRoute(fastify: FastifyInstance) {
           .status(HttpStatus.NOT_FOUND)
           .send({ error: "No user found" });
       }
-
-      // fetch user groups
-      const groupList: IGroup[] = [];
-      const groups = this.DBClient.groupCollection().find<IGroup>(
-        {
-          members: memberId,
-        },
-        { projection: { members: 0 } }
-      );
-      for await (const group of groups) {
-        groupList.push(group);
-      }
-
-      // create response object;
-
-      const resultObj = {
-        ...user,
-        groupList,
-      };
-      return reply.status(HttpStatus.SUCCESS).send(resultObj);
+      return reply.status(HttpStatus.SUCCESS).send(user);
     } catch (err) {
       return reply
         .status(HttpStatus.BAD_GATEWAY)

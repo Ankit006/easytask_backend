@@ -8,6 +8,7 @@ import { IGroup } from "../database/database.schema";
 import { ObjectId } from "@fastify/mongodb";
 
 export default function companyGroupRoutes(fastify: FastifyInstance) {
+  // create a group
   fastify.post("/group", async function (request, reply) {
     const validatedData = CreateCompanyGroupPostValidation.safeParse(
       request.body
@@ -35,6 +36,7 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // get list of groups
   fastify.get("/group", async function (request, reply) {
     try {
       const res = this.DBClient.groupCollection().find<IGroup>(
@@ -55,6 +57,7 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // delete a group
   fastify.delete("/group/delete/:groupId", async function (request, reply) {
     const { groupId } = request.params as { groupId: string };
     try {
@@ -71,6 +74,32 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // get list of groups of a member
+
+  fastify.get("/group/member/:memberId", async function (request, reply) {
+    const { memberId } = request.params as { memberId: string };
+    if (!ObjectId.isValid(memberId)) {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send({ error: "Please provide valid member id" });
+    }
+
+    try {
+      const res = this.DBClient.groupCollection().find<IGroup>({
+        members: memberId,
+      });
+      const groupList: IGroup[] = [];
+      for await (let group of res) {
+        groupList.push(group);
+      }
+      return reply.status(HttpStatus.SUCCESS).send(groupList);
+    } catch (err) {
+      return reply
+        .status(HttpStatus.BAD_GATEWAY)
+        .send(mongoErrorFormatter(err));
+    }
+  });
+  // assign group to a member
   fastify.put("/group/member", async function (request, reply) {
     const validData = assignMemberToGroupPutValidation.safeParse(request.body);
 
@@ -93,6 +122,17 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
           .send({ error: "User is not a member of this company" });
       }
 
+      // check if member is already part of this group
+      const group = await this.DBClient.groupCollection().findOne({
+        members: validData.data.memberId,
+      });
+
+      if (group) {
+        return reply
+          .status(HttpStatus.CONFLICT)
+          .send({ error: "Group already assigned" });
+      }
+
       // now we push the memberId into the members array in group document
       await this.DBClient.groupCollection().updateOne(
         { _id: new ObjectId(validData.data.groupId) },
@@ -108,6 +148,7 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // remove member from a group
   fastify.put("/group/member/remove", async function (request, reply) {
     const validData = assignMemberToGroupPutValidation.safeParse(request.body);
 
