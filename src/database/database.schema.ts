@@ -77,4 +77,5 @@ export interface IProject {
   projectDesc: string;
   projectCost: string;
   projectDeadLine: string;
+  completed: boolean;
 }
