@@ -110,21 +110,10 @@ export default function companyGroupRoutes(fastify: FastifyInstance) {
     }
 
     try {
-      // check if the member is the member of the current company
-      const member = await this.DBClient.membersCollection().findOne({
-        companyId: request.companyId,
-        userId: validData.data.memberId,
-      });
-
-      if (!member) {
-        return reply
-          .send(HttpStatus.NOT_FOUND)
-          .send({ error: "User is not a member of this company" });
-      }
-
       // check if member is already part of this group
       const group = await this.DBClient.groupCollection().findOne({
         members: validData.data.memberId,
+        _id: new ObjectId(validData.data.groupId),
       });
 
       if (group) {
