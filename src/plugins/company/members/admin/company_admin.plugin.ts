@@ -1,7 +1,7 @@
 import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
-import { CompanyPluginOptionType } from "../../../../../../types";
-import companyAdminRoute from "./company_admin.route";
-import { HttpStatus } from "../../../../../../utils";
+import { CompanyPluginOptionType } from "../../../../types";
+import { HttpStatus } from "../../../../utils";
+import companyAdminRoute from "../../../../routes/company_admin.routes";
 
 export default function companyAdminPlugin(
   fastifyInstance: FastifyInstance,
@@ -17,5 +17,8 @@ export default function companyAdminPlugin(
     }
   });
   companyAdminRoute(fastifyInstance);
+
+  fastifyInstance.register(require("./groups/company_groups.plugin.ts"));
+  fastifyInstance.register(require("./member/company_admin_member.plugin"));
   done();
 }

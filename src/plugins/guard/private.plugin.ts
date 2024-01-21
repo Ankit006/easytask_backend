@@ -37,6 +37,10 @@ export default function privateGuardPlugin(
     }
   });
 
+  fastifyInstance.register(require("../users/users.plugin"), {
+    prefix: "/user",
+  });
+
   // company plugin
   fastifyInstance.register(require("../company/company.plugin"), {
     prefix: "/company",

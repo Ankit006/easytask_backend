@@ -1,8 +1,9 @@
 import { FastifyInstance } from "fastify";
-import { HttpStatus, mongoErrorFormatter } from "../../utils";
-import { ICompany, IMember, ImageStore } from "../../database/database.schema";
-import { CompanyFileFormValidation } from "./validation";
 import { ObjectId } from "@fastify/mongodb";
+import { IMember, ICompany, ImageStore } from "../database/database.schema";
+import { HttpStatus, mongoErrorFormatter } from "../utils";
+import { CompanyFileFormValidation } from "../validation/company.validation";
+
 export function companyRoutes(fastifyInstance: FastifyInstance) {
   fastifyInstance.get("/", async function (request, reply) {
     try {
@@ -70,7 +71,6 @@ export function companyRoutes(fastifyInstance: FastifyInstance) {
         // create memberData
         const memberData: Partial<IMember> = {
           companyId: companyData._id?.toString(),
-          designation: [],
           role: "Admin",
           userId: req.userId,
         };

@@ -1,12 +1,15 @@
-import { DoneFuncWithErrOrRes, FastifyInstance } from "fastify";
-import { CompanyMemberPluginOptionType } from "./validation";
-import { IMember } from "../../../../database/database.schema";
-import { HttpStatus } from "../../../../utils";
-import { companyMemberRoute } from "./company_member.route";
+import { FastifyInstance, DoneFuncWithErrOrRes } from "fastify";
+import { IMember } from "../../../database/database.schema";
+import { companyMemberRoute } from "../../../routes/company_members.routes";
+import { HttpStatus } from "../../../utils";
+import { BaseOptionTypes } from "../../../validation";
 
+/**
+ *  Routes under this plugin access by any member in the company
+ */
 export default function companyMemebersPlugin(
   fastifyInstance: FastifyInstance,
-  _opts: CompanyMemberPluginOptionType,
+  _opts: BaseOptionTypes,
   done: DoneFuncWithErrOrRes
 ) {
   fastifyInstance.decorateRequest("companyId", "");
@@ -27,6 +30,6 @@ export default function companyMemebersPlugin(
     request.memberRole = member.role;
   });
   companyMemberRoute(fastifyInstance);
-  fastifyInstance.register(require("./plugin/admin/company_admin.plugin"));
+  fastifyInstance.register(require("./admin/company_admin.plugin"));
   done();
 }

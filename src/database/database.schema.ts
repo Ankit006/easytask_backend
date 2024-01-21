@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { SignUpBodySchema, companyBodyValidation } from "../validation";
 import { ObjectId } from "@fastify/mongodb";
+import { z } from "zod";
+import { companyBodyValidation } from "../validation";
 
 export interface IUser {
   _id: ObjectId;
@@ -29,21 +29,22 @@ export interface IMember {
   userId: string;
   companyId: string;
   role: "Admin" | "Member";
-  designation: string[];
 }
 
-export interface NotificationType {
-  type: "CONFIRMATION" | "MESSAGE";
-  message: string;
+export interface IJoinRequestNotification {
+  _id: string;
+  type: "JOIN_REQUEST";
+  companyDetail: {
+    companyId: string;
+    companyLogo: null | ImageStore;
+    companyName: string;
+  };
+  timestamp: string;
+}
 
-  // links attribute is for CONFIRMATION notification, for MESSAGE it will be null
-  links: {
-    accept: string;
-    decline: string;
-  } | null;
-
-  // isViewed indicate that if the current notification is viewed by the user. By default the value is false
-  isViewed: boolean;
-  userId: ObjectId;
-  companyId: ObjectId;
+export interface IGroup {
+  _id: ObjectId;
+  name: string;
+  companyId: string;
+  members: [];
 }

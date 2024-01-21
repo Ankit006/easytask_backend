@@ -2,6 +2,7 @@ import { ObjectId } from "@fastify/mongodb";
 import { FastifyInstance } from "fastify";
 import { Socket } from "socket.io";
 import { z } from "zod";
+import { IJoinRequestNotification } from "../../database/database.schema";
 
 const validatedAuth = z.object({
   userId: z.string().refine((value) => ObjectId.isValid(value), {
@@ -10,10 +11,11 @@ const validatedAuth = z.object({
 });
 
 export default class WebSocket {
-  webSocket: Socket;
+  private fastify: FastifyInstance;
 
   constructor(fastify: FastifyInstance) {
-    this.webSocket = undefined as any;
+    this.fastify = fastify;
+    let userId = "";
     // check if socket has valid userId
     fastify.io.use((socket, next) => {
       const newSocket = socket as any;
@@ -21,14 +23,28 @@ export default class WebSocket {
       if (!validData.success) {
         return next(new Error("Thou shall not pass"));
       }
+      userId = validData.data.userId;
       next();
     });
 
+    // list to connection
     fastify.io.on("connection", (socket: Socket) => {
-      this.webSocket = socket;
+      // join user to a room.
+      // this is a personal room where backend emit different event such as notification
+      socket.join(userId);
       socket.on("disconnect", () => {
         console.log("user disconnected");
       });
     });
+  }
+  emitEvent(
+    type: "notification",
+    userId: string,
+    payload: IJoinRequestNotification
+  ) {
+    if (type === "notification") {
+      this.fastify.io.to(userId).emit("notification", payload);
+      this.fastify.redisCache.storeNotification(userId, payload);
+    }
   }
 }
