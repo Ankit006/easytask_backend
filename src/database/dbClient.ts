@@ -12,6 +12,8 @@ export default class DBClient {
     notification: "notification",
     members: "members",
     groups: "groups",
+    projects: "projects",
+    projectSprints: "projectSprints",
   };
 
   constructor(fastifyInstance: FastifyInstance) {
@@ -45,5 +47,11 @@ export default class DBClient {
 
   groupCollection() {
     return this.getClient().collection(this.collection.groups);
+  }
+  projectCollection() {
+    return this.getClient().collection(this.collection.projects);
+  }
+  projectSprintCollection() {
+    return this.getClient().collection(this.collection.projectSprints);
   }
 }

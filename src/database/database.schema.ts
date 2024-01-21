@@ -48,3 +48,33 @@ export interface IGroup {
   companyId: string;
   members: [];
 }
+
+interface IProjectTask {
+  memberId: string;
+  task: string;
+  completed: boolean;
+  referMember: [
+    {
+      text: string;
+      memberId: string;
+    }
+  ];
+}
+
+export interface IProjectSprint {
+  _id: ObjectId;
+  projectId: string;
+  sprintIndex: number;
+  sprintStartDate: string;
+  sprintEndDate: string;
+  tasks: IProjectTask[];
+}
+
+export interface IProject {
+  _id: ObjectId;
+  name: string;
+  companyId: string;
+  projectDesc: string;
+  projectCost: string;
+  projectDeadLine: string;
+}

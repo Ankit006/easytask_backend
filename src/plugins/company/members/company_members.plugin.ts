@@ -31,5 +31,8 @@ export default function companyMemebersPlugin(
   });
   companyMemberRoute(fastifyInstance);
   fastifyInstance.register(require("./admin/company_admin.plugin"));
+  fastifyInstance.register(require("./projects/projects.plugin"), {
+    prefix: "/project",
+  });
   done();
 }
