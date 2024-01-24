@@ -30,4 +30,43 @@ export default function projectRoutes(fastify: FastifyInstance) {
         .send(mongoErrorFormatter(err));
     }
   });
+
+  fastify.get("/", async function (request, reply) {
+    try {
+      const res = this.DBClient.projectCollection().find<IProject>({
+        companyId: request.companyId,
+      });
+
+      type ProjectListItem = IProject & {
+        workDone: number; // This value represent total work done in the project in percentage
+      };
+      const projectList: ProjectListItem[] = [];
+
+      for await (let project of res) {
+        const totalSprints =
+          await this.DBClient.projectSprintCollection().countDocuments({
+            projectId: project._id,
+          });
+
+        const completedSprints =
+          await this.DBClient.projectSprintCollection().countDocuments({
+            projectId: project._id,
+            completed: true,
+          });
+
+        const workDone =
+          totalSprints > 0 ? (completedSprints / totalSprints) * 100 : 0;
+        const listItme = {
+          ...project,
+          workDone,
+        };
+        projectList.push(listItme);
+      }
+      return reply.status(HttpStatus.SUCCESS).send(projectList);
+    } catch (err) {
+      return reply
+        .status(HttpStatus.BAD_REQUEST)
+        .send(mongoErrorFormatter(err));
+    }
+  });
 }
