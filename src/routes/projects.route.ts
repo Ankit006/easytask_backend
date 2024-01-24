@@ -13,7 +13,7 @@ export default function projectRoutes(fastify: FastifyInstance) {
     }
     const projectObj: Partial<IProject> = {
       name: validData.data.name,
-      companyId: validData.data.companyId,
+      companyId: request.companyId,
       projectDesc: validData.data.projectDesc,
       projectCost: validData.data.projectCost,
       projectDeadLine: validData.data.projectDeadLine,
