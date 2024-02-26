@@ -1,7 +1,4 @@
 import { FastifyInstance } from "fastify";
-import argon2 from "argon2";
-import { singUpBodyType } from "../types";
-import { IUser } from "./database.schema";
 
 export default class DBClient {
   private fastifyInstance: FastifyInstance;
